@@ -1,0 +1,33 @@
+.register-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #6a0dad, #ff4500);
+    color: white;
+  }
+  
+  .register-page input {
+    margin: 10px 0;
+    padding: 10px;
+    width: 80%;
+    max-width: 400px;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .register-page button {
+    padding: 10px 20px;
+    background: #ff6347;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .register-page button:hover {
+    background: #ff4500;
+  }
+  

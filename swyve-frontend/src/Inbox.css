@@ -1,0 +1,56 @@
+.inbox-page {
+    background: linear-gradient(135deg, #ff4500, #6a0dad);
+    color: white;
+    padding: 20px;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .inbox-title {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .message-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+  
+  .message-item:hover {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .sender-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .message-time {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  .message-content {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  

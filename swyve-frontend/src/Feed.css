@@ -1,0 +1,100 @@
+/* Feed-container med dynamisk gradient */
+.feed {
+  height: calc(100vh - 60px); /* Juster for bunnnavigasjon */
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: linear-gradient(135deg, #6a0dad, #ff4500, #4b0082, #ff6347);
+  background-size: 400% 400%;
+  animation: gradientAnimation 12s ease infinite;
+}
+
+.video-card {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: start;
+  position: relative;
+}
+
+.video-player {
+  height: 100%;
+  width: auto;
+  max-height: 100%;
+  object-fit: cover;
+  border: 2px solid #ff4500;
+  border-radius: 10px;
+}
+
+.video-overlay {
+  position: absolute;
+  bottom: 10%;
+  left: 10px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 0 0 5px black;
+}
+
+.infinite-scroll-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #6a0dad, #ff4500);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.infinite-scroll-toggle:hover {
+  background: linear-gradient(135deg, #ff4500, #6a0dad);
+  transform: scale(1.05);
+}
+
+.video-actions {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.video-actions button {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.video-actions button:hover {
+  transform: scale(1.2);
+}
+
+.video-actions button {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.video-actions button:hover {
+  transform: scale(1.2);
+  background: linear-gradient(135deg, #6a0dad, #ff4500);
+}
