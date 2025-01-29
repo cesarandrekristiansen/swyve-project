@@ -21,6 +21,31 @@ const db = new sqlite3.Database('./database.db', (err) => {
   }
 });
 
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS playlists (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS streaks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    last_active TEXT NOT NULL,
+    streak_count INTEGER DEFAULT 1
+  )`);
+
+  console.log("Tables ensured in SQLite database.");
+});
+
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -65,7 +90,7 @@ app.post('/login', (req, res) => {
 });
 
 // **3. Oppdater streak**
-app.post('/api/streak', (req, res) => {
+app.post('/streak', (req, res) => {
   const { userId } = req.body;
   const today = new Date().toISOString().split('T')[0];
 
@@ -145,6 +170,17 @@ app.post('/api/playlists/:playlistId/videos', (req, res) => {
       res.json({ message: 'Video added to playlist!' });
     }
   );
+});
+
+app.get('/api/playlists', (req, res) => {
+  const { userId } = req.query;
+
+  db.all('SELECT * FROM playlists WHERE user_id = ?', [userId], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
 });
 
 // **6. Uforutsigbar belønning**

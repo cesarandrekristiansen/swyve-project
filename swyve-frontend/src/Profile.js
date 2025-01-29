@@ -5,6 +5,8 @@ import './Profile.css';
 function Profile() {
   const [streak, setStreak] = useState(0);
   const [playlists, setPlaylists] = useState([]);
+  const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"; // Backend-URL
+
   const user = {
     username: 'User123',
     followers: 1000,
@@ -19,7 +21,7 @@ function Profile() {
 
   // Hent streak-data
   useEffect(() => {
-    fetch('/api/streak', {
+    fetch(`${BASE_URL}/streak`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: 1 }), // Eksempel bruker-ID
@@ -31,7 +33,7 @@ function Profile() {
 
   // Hent spillelister
   useEffect(() => {
-    fetch('/api/playlists?userId=1') // Eksempel bruker-ID
+    fetch(`${BASE_URL}/api/playlists?userId=1`) // Eksempel bruker-ID
       .then((res) => res.json())
       .then((data) => setPlaylists(data))
       .catch((error) => console.error('Error fetching playlists:', error));
