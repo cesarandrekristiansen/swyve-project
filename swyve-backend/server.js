@@ -46,7 +46,14 @@ db.serialize(() => {
 });
 
 
-app.use(cors());
+const corsOptions = {
+  origin: "https://swyve-frontend.onrender.com",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 app.use(bodyParser.json());
 
 // **1. Registrering av bruker**
