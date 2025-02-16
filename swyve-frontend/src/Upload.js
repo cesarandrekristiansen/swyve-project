@@ -5,6 +5,7 @@ function Upload() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [uploading, setUploading] = useState(false);
+  const backendUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -24,7 +25,7 @@ function Upload() {
       formData.append('video', file);
 
       // Change localhost:5000 to your Render URL in production
-      const uploadRes = await fetch('http://localhost:5000/api/upload-video', {
+      const uploadRes = await fetch(`${backendUrl}/api/upload-video`, {
         method: 'POST',
         body: formData,
       });
@@ -42,7 +43,7 @@ function Upload() {
       console.log('Video uploaded. URL:', videoUrl);
 
       // 2) Save metadata in the "videos" table
-      const metadataRes = await fetch('http://localhost:5000/api/videos', {
+      const metadataRes = await fetch(`${backendUrl}/api/videos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
