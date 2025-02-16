@@ -5,7 +5,7 @@ function Upload() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [uploading, setUploading] = useState(false);
-  const backendUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
