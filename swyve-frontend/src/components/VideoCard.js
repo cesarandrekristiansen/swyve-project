@@ -28,7 +28,6 @@ function VideoCard({ videoSrc, userName, description, likes: initialLikes, comme
         ref={videoRef}
         src={videoSrc}
         className="video-player"
-        muted
         loop
         playsInline
         autoPlay
