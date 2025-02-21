@@ -35,7 +35,6 @@ pool.query('SELECT NOW()', (err, res) => {
 // Configure CORS to allow requests from your frontend on Render
 const corsOptions = {
   origin: "https://swyve-frontend.onrender.com",
-  //origin: "http://localhost:3000/",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
@@ -194,6 +193,21 @@ app.post('/api/videos', async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   });
+
+  /* ============================================================
+   GET Videos Endpoint
+   ============================================================
+   This endpoint fetches all video records from the "videos" table.
+*/
+app.get('/api/videos', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM videos ORDER BY id DESC');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
   
 
 /* ============================================================

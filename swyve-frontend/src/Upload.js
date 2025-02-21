@@ -5,6 +5,8 @@ function Upload() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  // Use the environment variable, falling back to localhost if not set
   const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
   const handleFileChange = (e) => {
@@ -20,11 +22,10 @@ function Upload() {
     setUploading(true);
 
     try {
-      // 1) Upload the file to our backend
+      // Step 1: Upload the video file to the backend
       const formData = new FormData();
       formData.append('video', file);
 
-      // Change localhost:5000 to your Render URL in production
       const uploadRes = await fetch(`${backendUrl}/api/upload-video`, {
         method: 'POST',
         body: formData,
@@ -39,18 +40,17 @@ function Upload() {
       if (!videoUrl) {
         throw new Error('No videoUrl returned from upload endpoint');
       }
-
       console.log('Video uploaded. URL:', videoUrl);
 
-      // 2) Save metadata in the "videos" table
+      // Step 2: Save video metadata (including videoUrl) to the database
       const metadataRes = await fetch(`${backendUrl}/api/videos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title,
           videoUrl,
-          thumbnail: '',     // or set a real thumbnail if you have one
-          duration: '',      // or calculate duration
+          thumbnail: '', // Optionally, you can add a thumbnail URL
+          duration: '',  // Optionally, add video duration
           tags: '',
           embed_code: ''
         }),
@@ -62,14 +62,13 @@ function Upload() {
       }
 
       console.log('Metadata saved:', metadataData);
-
       alert('Video uploaded and metadata saved successfully!');
-
-      // Reset form
+      
+      // Reset the form
       setFile(null);
       setTitle('');
     } catch (err) {
-      console.error(err);
+      console.error('Error:', err);
       alert('Error: ' + err.message);
     } finally {
       setUploading(false);

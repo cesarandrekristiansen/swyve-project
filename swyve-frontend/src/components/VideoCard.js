@@ -1,21 +1,47 @@
-import React from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import './VideoCard.css';
+import { useInView } from 'react-intersection-observer';
+import { FaHeart, FaComment } from 'react-icons/fa'; // Importer ikoner
 
-function VideoCard({ videoSrc, userName, description, likes, comments }) {
+function VideoCard({ video, onVideoEnd }) {
+  const videoRef = useRef(null);
+  const [ref, inView] = useInView({ threshold: 0.7 });
+  const [likes, setLikes] = useState(video.likes);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (inView) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [inView]);
+
+  const handleLike = () => {
+    setLikes((prev) => prev + 1);
+  };
+
   return (
-    <div className="video-card">
-      <video 
-        src={videoSrc}
-        className="video-player" 
-        controls // eller autoPlay, loop, muted
+    <div ref={ref} className="video-card">
+      <video
+        ref={videoRef}
+        src={video.src}
+        className="video-player"
+        muted
+        loop
+        onEnded={onVideoEnd} // Trigge når videoen er ferdig
       />
-      <div className="video-info">
-        <h3>@{userName}</h3>
-        <p>{description}</p>
-        <div className="video-stats">
-          <span>Likes: {likes}</span>
-          <span>Comments: {comments}</span>
-        </div>
+      <div className="video-overlay">
+        <p>@{video.userName}</p>
+      </div>
+      <div className="video-actions">
+        <button className="like-btn" onClick={handleLike}>
+          <FaHeart /> {likes}
+        </button>
+        <button className="comment-btn">
+          <FaComment />
+        </button>
       </div>
     </div>
   );
