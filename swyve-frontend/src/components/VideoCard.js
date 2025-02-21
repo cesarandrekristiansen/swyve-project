@@ -30,6 +30,8 @@ function VideoCard({ videoSrc, userName, description, likes: initialLikes, comme
         className="video-player"
         muted
         loop
+        playsInline
+        autoPlay
         onEnded={onVideoEnd}
       />
       <div className="video-overlay">
