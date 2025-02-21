@@ -79,8 +79,8 @@ function Feed() {
          videoSrc={video.url}               // Use the URL from the DB
          userName={"Uploader"}              // Use a default or later add the uploader's name
          description={video.title}          // Use the title as the description
-         likes={0}                          // Set default values for now
-         comments={0}
+         likes={video.likes || 0}
+        comments={video.comments || 0}
          onVideoEnd={() => setWatchedVideos(prev => prev + 1)}
        />
       ))}

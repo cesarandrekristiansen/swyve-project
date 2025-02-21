@@ -47,7 +47,7 @@ db.serialize(() => {
 
 
 const corsOptions = {
-  origin: "https://swyve-frontend.onrender.com",
+  origin: "http://localhost:3000",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };

@@ -3,10 +3,10 @@ import './VideoCard.css';
 import { useInView } from 'react-intersection-observer';
 import { FaHeart, FaComment } from 'react-icons/fa'; // Importer ikoner
 
-function VideoCard({ video, onVideoEnd }) {
+function VideoCard({ videoSrc, userName, description, likes: initialLikes, comments, onVideoEnd }) {
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
-  const [likes, setLikes] = useState(video.likes);
+  const [likes, setLikes] = useState(initialLikes || 0);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -19,21 +19,21 @@ function VideoCard({ video, onVideoEnd }) {
   }, [inView]);
 
   const handleLike = () => {
-    setLikes((prev) => prev + 1);
+    setLikes(prev => prev + 1);
   };
 
   return (
     <div ref={ref} className="video-card">
       <video
         ref={videoRef}
-        src={video.src}
+        src={videoSrc}
         className="video-player"
         muted
         loop
-        onEnded={onVideoEnd} // Trigge når videoen er ferdig
+        onEnded={onVideoEnd}
       />
       <div className="video-overlay">
-        <p>@{video.userName}</p>
+        <p>@{userName}</p>
       </div>
       <div className="video-actions">
         <button className="like-btn" onClick={handleLike}>
