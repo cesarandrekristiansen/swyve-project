@@ -67,14 +67,6 @@ function Profile() {
         <p>🔥 Streak: {streak} days</p>
       </div>
 
-      {/* "Registrer deg"-knapp */}
-      <div className="register-section">
-        <p>Vil du bli med?</p>
-        <NavLink to="/register" className="register-btn">
-          Registrer deg
-        </NavLink>
-      </div>
-
       {/* Spillelister */}
       <div className="playlists-section">
         <h2>Your Playlists</h2>

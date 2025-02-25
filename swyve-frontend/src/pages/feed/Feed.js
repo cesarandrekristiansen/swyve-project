@@ -1,7 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import VideoCard from './components/VideoCard';
-import { useInView } from 'react-intersection-observer';
-import { FaHeart, FaComment } from 'react-icons/fa'; // Importer ikoner
+import React, { useState, useEffect } from 'react';
+import VideoCard from '../../components/videocard/VideoCard';
 import './Feed.css';
 
 function Feed() {
@@ -17,7 +15,7 @@ function Feed() {
      fetch(`${backendUrl}/api/videos`)
        .then(res => res.json())
        .then(data => {
-         console.log('Fetched videos:', data);
+         //console.log('Fetched videos:', data);
          setVideos(data);
        })
        .catch(err => console.error("Error fetching videos:", err));
@@ -74,16 +72,18 @@ function Feed() {
 
       {/* Video feed */}
       {videos.map((video) => (
-         <VideoCard
-         key={video.id}
-         videoSrc={video.url}               // Use the URL from the DB
-         userName={"Uploader"}              // Use a default or later add the uploader's name
-         description={video.title}          // Use the title as the description
-         likes={video.likes || 0}
-        comments={video.comments || 0}
-         onVideoEnd={() => setWatchedVideos(prev => prev + 1)}
-       />
-      ))}
+  <VideoCard
+    key={video.id}
+    videoSrc={video.url}  // Use the URL from the DB
+    source={video.source} // Pass the source property (e.g., "library" or "user")
+    userName={"Uploader"} // Default uploader name; adjust as needed
+    description={video.title} // Use the title as the description
+    likes={video.likes || 0}
+    comments={video.comments || 0}
+    onVideoEnd={() => setWatchedVideos(prev => prev + 1)}
+  />
+))}
+
     </div>
   );
 }

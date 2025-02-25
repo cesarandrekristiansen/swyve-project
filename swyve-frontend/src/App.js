@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import './App.css';
-import SplashScreen from './SplashScreen';
-import Feed from './Feed';
-import Profile from './Profile';
-import Upload from './Upload';
-import Inbox from './Inbox';
-import Register from './Register';
-import Login from './Login';
-import Trending from './Trending';
+import SplashScreen from './components/splashscreen/SplashScreen';
+import Feed from './pages/feed/Feed';
+import Profile from './pages/profile/Profile';
+import Upload from './pages/upload/Upload';
+import Inbox from './pages/inbox/Inbox';
+import Register from './pages/landingPage/register/Register';
+import Login from './pages/landingPage/login/Login';
+import LandingPage from './pages/landingPage/LandingPage';
+import Trending from './pages/trending/Trending';
 import Stats from './Stats';
+import ProtectedRoute from './components/ProtectedRoute';
 import {
   FaHome,
   FaPlusCircle,
   FaEnvelope,
   FaUser,
   FaFire,
-  
   FaSyncAlt,
 } from 'react-icons/fa';
 
@@ -34,42 +35,34 @@ function App() {
   };
 
   const isVideoPage = location.pathname === '/' || location.pathname === '/following';
-
-  const iconStyle = {
-    transition: 'transform 0.2s ease',
-    fontSize: '24px',
-  };
-
-  if (showSplash) {
-    return <SplashScreen onFinish={handleSplashFinish} />;
-  }
+  const iconStyle = { transition: 'transform 0.2s ease', fontSize: '24px' };
 
   return (
     <div className="app">
-      {isVideoPage && (
-        <button className="infinite-scroll-icon" onClick={toggleInfiniteScroll}>
-          <FaSyncAlt
-            style={{
-              color: infiniteScroll ? '#00ff00' : '#ffffff',
-              fontSize: '20px',
-            }}
-          />
-        </button>
-      )}
+      {/* Public Routes */}
+      <Routes>
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      <div className="main-content">
-        <Routes>
-          <Route path="/" element={<Feed infiniteScroll={infiniteScroll} />} />
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/splash" element={<SplashScreen onFinish={handleSplashFinish} />} />
+          <Route path="/" element={showSplash ? <SplashScreen onFinish={handleSplashFinish} /> : <Feed infiniteScroll={infiniteScroll} />} />
           <Route path="/following" element={<Feed infiniteScroll={infiniteScroll} />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/inbox" element={<Inbox />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/stats" element={<Stats />} />
-        </Routes>
-      </div>
+        </Route>
+      </Routes>
+
+      {isVideoPage && (
+        <button className="infinite-scroll-icon" onClick={toggleInfiniteScroll}>
+          <FaSyncAlt style={{ color: infiniteScroll ? '#00ff00' : '#ffffff', fontSize: '20px' }} />
+        </button>
+      )}
 
       <div className="bottom-nav">
         <NavLink to="/trending" className="nav-item">

@@ -1,0 +1,56 @@
+/* Use a modern font – make sure to import this in your index.html or at the top of your CSS */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+.splash-screen {
+  display: flex;
+  flex-direction: column;  /* Stack items vertically */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #6a0dad, #ff4500, #4b0082, #ff6347);
+  color: #fff;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.splash-logo {
+  width: 180px;      /* Adjusted for a slightly larger logo */
+  margin-bottom: 20px;
+  animation: scaleUp 1.5s ease-in-out;
+}
+
+.splash-message {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.enter-button {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background-color: #00ff00;
+  color: #fff;            /* White text on the button */
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+
+
+/* Animations */
+@keyframes scaleUp {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}

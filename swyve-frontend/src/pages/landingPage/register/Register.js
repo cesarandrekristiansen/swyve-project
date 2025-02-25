@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Register.css';
 
 function Register() {
@@ -6,10 +7,14 @@ function Register() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+
+  // Use backend URL from environment variable, fallback to localhost if not set.
+  const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://localhost:5000/register', {
+      const response = await fetch(`${backendUrl}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, username }),
@@ -18,6 +23,8 @@ function Register() {
       const data = await response.json();
       if (response.ok) {
         setMessage('User registered successfully!');
+        // Redirect to login page after successful registration
+        navigate('/login');
       } else {
         setMessage(data.error || 'Registration failed.');
       }
