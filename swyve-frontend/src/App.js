@@ -36,6 +36,8 @@ function App() {
 
   const isVideoPage = location.pathname === '/' || location.pathname === '/following';
   const iconStyle = { transition: 'transform 0.2s ease', fontSize: '24px' };
+  const token = localStorage.getItem('token');
+
 
   return (
     <div className="app">
@@ -64,23 +66,25 @@ function App() {
         </button>
       )}
 
-      <div className="bottom-nav">
-        <NavLink to="/trending" className="nav-item">
-          <FaFire style={iconStyle} />
-        </NavLink>
-        <NavLink to="/" className="nav-item">
-          <FaHome style={iconStyle} />
-        </NavLink>
-        <NavLink to="/upload" className="nav-item upload-btn">
-          <FaPlusCircle style={{ ...iconStyle, fontSize: '28px' }} />
-        </NavLink>
-        <NavLink to="/inbox" className="nav-item">
-          <FaEnvelope style={iconStyle} />
-        </NavLink>
-        <NavLink to="/profile" className="nav-item">
-          <FaUser style={iconStyle} />
-        </NavLink>
-      </div>
+      {token && (
+        <div className="bottom-nav">
+          <NavLink to="/trending" className="nav-item">
+            <FaFire style={iconStyle} />
+          </NavLink>
+          <NavLink to="/" className="nav-item">
+            <FaHome style={iconStyle} />
+          </NavLink>
+          <NavLink to="/upload" className="nav-item upload-btn">
+            <FaPlusCircle style={{ ...iconStyle, fontSize: '28px' }} />
+          </NavLink>
+          <NavLink to="/inbox" className="nav-item">
+            <FaEnvelope style={iconStyle} />
+          </NavLink>
+          <NavLink to="/profile" className="nav-item">
+            <FaUser style={iconStyle} />
+          </NavLink>
+        </div>
+      )}
     </div>
   );
 }
