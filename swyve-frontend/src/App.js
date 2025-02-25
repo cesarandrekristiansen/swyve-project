@@ -19,6 +19,7 @@ import {
   FaUser,
   FaFire,
   FaSyncAlt,
+  FaSearch,
 } from 'react-icons/fa';
 
 function App() {
@@ -69,7 +70,7 @@ function App() {
       {token && (
         <div className="bottom-nav">
           <NavLink to="/trending" className="nav-item">
-            <FaFire style={iconStyle} />
+            <FaSearch style={iconStyle} />
           </NavLink>
           <NavLink to="/" className="nav-item">
             <FaHome style={iconStyle} />
