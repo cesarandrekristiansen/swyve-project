@@ -23,6 +23,8 @@ function Login() {
       if (response.ok) {
         setMessage('Login successful!');
         localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.userId);
+        console.log('UserId login page: ', data.userId);
         // Redirect to splash screen after login
         navigate('/');
       } else {

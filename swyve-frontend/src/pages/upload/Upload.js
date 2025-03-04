@@ -5,6 +5,10 @@ function Upload() {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [uploading, setUploading] = useState(false);
+  const userId = localStorage.getItem('userId');
+
+  console.log('UserID: ', userId);
+
 
   // Use the environment variable, falling back to localhost if not set
   const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
@@ -42,6 +46,8 @@ function Upload() {
       }
       console.log('Video uploaded. URL:', videoUrl);
 
+
+
       // Step 2: Save video metadata (including videoUrl) to the database
       const metadataRes = await fetch(`${backendUrl}/api/videos`, {
         method: 'POST',
@@ -49,10 +55,11 @@ function Upload() {
         body: JSON.stringify({
           title,
           videoUrl,
-          thumbnail: '', // Optionally, you can add a thumbnail URL
-          duration: '',  // Optionally, add video duration
+          thumbnail: '', // Optionally add a thumbnail URL
+          duration: '',  // Optionally add video duration
           tags: '',
-          embed_code: ''
+          embed_code: '',
+          userId // Include the user id here
         }),
       });
       const metadataData = await metadataRes.json();

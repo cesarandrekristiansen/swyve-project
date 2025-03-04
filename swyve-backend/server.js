@@ -85,7 +85,11 @@ app.post('/login', async (req, res) => {
     }
     // Generate a JWT token for the user
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).send({ token, username: user.username });
+    res.status(200).send({ 
+      token, 
+      username: user.username, 
+      userId: user.id });
+
   } catch (error) {
     res.status(500).send({ error: 'Error logging in' });
   }
@@ -182,17 +186,18 @@ app.post('/api/rewards', async (req, res) => {
 });
 
 app.post('/api/videos', async (req, res) => {
-    const { title, thumbnail, duration, tags, embed_code, videoUrl } = req.body;
-    try {
-      const result = await pool.query(
-        'INSERT INTO videos (title, url, thumbnail, duration, tags, embed_code) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [title, videoUrl, thumbnail, duration, tags, embed_code]
-      );
-      res.json({ message: 'Video metadata saved', video: result.rows[0] });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  });
+  const { title, thumbnail, duration, tags, embed_code, videoUrl, userId } = req.body;
+  try {
+    const result = await pool.query(
+      'INSERT INTO videos (title, url, thumbnail, duration, tags, embed_code, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [title, videoUrl, thumbnail, duration, tags, embed_code, userId]
+    );
+    res.json({ message: 'Video metadata saved', video: result.rows[0] });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
   /* ============================================================
    GET Videos Endpoint
