@@ -26,6 +26,8 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [infiniteScroll, setInfiniteScroll] = useState(false);
   const location = useLocation();
+  const userId = localStorage.getItem('userId');
+
 
   const handleSplashFinish = () => {
     setShowSplash(false);
@@ -55,7 +57,7 @@ function App() {
           <Route path="/following" element={<Feed infiniteScroll={infiniteScroll} />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/inbox" element={<Inbox />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:profileId" element={<Profile />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/stats" element={<Stats />} />
         </Route>
@@ -81,9 +83,10 @@ function App() {
           <NavLink to="/inbox" className="nav-item">
             <FaEnvelope style={iconStyle} />
           </NavLink>
-          <NavLink to="/profile" className="nav-item">
+          <NavLink to={`/profile/${userId}`} className="nav-item">
             <FaUser style={iconStyle} />
           </NavLink>
+
         </div>
       )}
     </div>

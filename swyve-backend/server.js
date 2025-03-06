@@ -207,9 +207,32 @@ app.post('/api/videos', async (req, res) => {
 app.get('/api/videos', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM videos ORDER BY id DESC');
-    res.json(result.rows);
+    return res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// 2) NEW endpoint: only videos for a given user
+app.get('/api/users/:userId/videos', async (req, res) => {
+  const { userId } = req.params;
+  console.log(userId);
+
+  // Optional: check if the user actually exists
+  const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [userId]);
+  if (userCheck.rows.length === 0) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  try {
+    // Fetch the user’s videos
+    const videosResult = await pool.query(
+      'SELECT * FROM videos WHERE user_id = $1 ORDER BY id DESC',
+      [userId]
+    );
+    return res.json(videosResult.rows);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 

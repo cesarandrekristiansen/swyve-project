@@ -1,47 +1,81 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './Profile.css';
 
 function Profile() {
+  // 1) Read userId from the URL, e.g. /profile/4 => profileId = "4"
+  const { profileId } = useParams();
+
   const [streak, setStreak] = useState(0);
   const [playlists, setPlaylists] = useState([]);
-  const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000"; // Backend-URL
+  const [userVideos, setUserVideos] = useState([]);
+  const [error, setError] = useState(null);
 
-  const user = {
-    username: 'User123',
-    followers: 1000,
-    following: 150,
-    likes: 5000,
-    profilePic: '/images/profile-Pic.png', // Oppdater med riktig sti
-    videos: [
-      { id: 1, src: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-      { id: 2, src: 'https://www.w3schools.com/html/movie.mp4' },
-    ],
-  };
+  const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
 
-  // Hent streak-data
+  // 2) Fetch streak for this user (if needed)
   useEffect(() => {
+    if (!profileId) return; // If no user ID, do nothing
     fetch(`${BASE_URL}/streak`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: 1 }), // Eksempel bruker-ID
+      body: JSON.stringify({ userId: profileId }),
     })
       .then((res) => res.json())
-      .then((data) => setStreak(data.streakCount))
+      .then((data) => setStreak(data.streakCount || 0))
       .catch((error) => console.error('Error fetching streak:', error));
-  }, []);
+  }, [BASE_URL, profileId]);
 
-  // Hent spillelister
+  // 3) Fetch playlists for this user (if you want)
   useEffect(() => {
-    fetch(`${BASE_URL}/api/playlists?userId=1`) // Eksempel bruker-ID
+    if (!profileId) return;
+    fetch(`${BASE_URL}/api/playlists?userId=${profileId}`)
       .then((res) => res.json())
       .then((data) => setPlaylists(data))
       .catch((error) => console.error('Error fetching playlists:', error));
-  }, []);
+  }, [BASE_URL, profileId]);
+
+  // 4) Fetch only this user’s videos from the new endpoint
+  useEffect(() => {
+    if (!profileId) return;
+    fetch(`${BASE_URL}/api/users/${profileId}/videos`)
+      .then((res) => {
+        if (!res.ok) {
+          // If user not found or some error
+          return res.json().then((data) => {
+            throw new Error(data.error || 'Error fetching videos');
+          });
+        }
+        return res.json();
+      })
+      .then((videos) => {
+        console.log('Fetched user videos:', videos);
+        setUserVideos(videos);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
+  }, [BASE_URL, profileId]);
+
+  // 5) Mock user info (for demonstration)
+  //    In a real app, you might fetch user info from an endpoint, e.g. /api/users/:id
+  const user = {
+    username: `User${profileId}`,
+    followers: 1000,
+    following: 150,
+    likes: 5000,
+    profilePic: '/images/profile-Pic.png'
+  };
+
+  // If there's an error (e.g. user not found), show it
+  if (error) {
+    return <div style={{ color: 'white', padding: '20px' }}>Error: {error}</div>;
+  }
 
   return (
     <div className="profile-page">
-      {/* Profiloversikt */}
+      {/* Profile overview */}
       <div className="profile-header">
         <img className="profile-pic" src={user.profilePic} alt="Profile" />
         <h2 className="username">@{user.username}</h2>
@@ -67,7 +101,7 @@ function Profile() {
         <p>🔥 Streak: {streak} days</p>
       </div>
 
-      {/* Spillelister */}
+      {/* Playlists */}
       <div className="playlists-section">
         <h2>Your Playlists</h2>
         <div className="playlists">
@@ -79,12 +113,19 @@ function Profile() {
         </div>
       </div>
 
-      {/* Videogalleri */}
+      {/* Video gallery */}
       <div className="video-gallery">
         <h2>Your Videos</h2>
-        {user.videos.map((video) => (
+        {userVideos.map((video) => (
           <div key={video.id} className="video-thumbnail">
-            <video src={video.src} muted loop />
+            {/* Use a thumbnail or poster for a nice still image */}
+            <video
+              src={video.url}
+              controls
+              muted
+              poster={video.thumbnail || '/images/default-thumbnail.jpg'}
+              style={{ backgroundColor: '#000' }}
+            />
           </div>
         ))}
       </div>
