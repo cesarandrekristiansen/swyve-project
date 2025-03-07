@@ -1,20 +1,24 @@
 import React, { useRef, useState, useEffect } from 'react';
-import './VideoCard.css';
 import { useInView } from 'react-intersection-observer';
-import { FaHeart, FaComment } from 'react-icons/fa';
+import { FaHeart, FaComment, FaBookmark } from 'react-icons/fa';
+import './VideoCard.css';
 
-// Optional: a helper to append autoplay if desired
-function getEmbedUrl(url) {
-  return url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`;
-}
-
-function VideoCard({ videoSrc, source, userName, description, likes: initialLikes, comments, onVideoEnd }) {
+function VideoCard({ 
+  videoId,
+  videoSrc, 
+  source, 
+  userName, 
+  description, 
+  likes: initialLikes, 
+  comments, 
+  onVideoEnd 
+}) {
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
   const [likes, setLikes] = useState(initialLikes || 0);
 
-  // For user-uploaded videos, control playback using the video element API.
   useEffect(() => {
+    // If source !== 'library', play/pause the <video> using the intersection observer
     if (source !== 'library' && videoRef.current) {
       if (inView) {
         videoRef.current.play();
@@ -24,25 +28,54 @@ function VideoCard({ videoSrc, source, userName, description, likes: initialLike
     }
   }, [inView, source]);
 
-  const handleLike = () => setLikes(prev => prev + 1);
+  const handleLike = () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert('Please log in to like.');
+      return;
+    }
+    setLikes(prev => prev + 1);
+  };
+
+  const handleComment = () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert('Please log in to comment.');
+      return;
+    }
+    alert('Comment functionality not implemented.');
+  }
+
+  // NEW: Save to Favorites
+  const handleSaveToFavorites = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      alert('Please log in to save favorites.');
+      return;
+    }
+    try {
+      const backendUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
+      const res = await fetch(`${backendUrl}/api/favorites`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, videoId })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to save video');
+      }
+      alert('Video saved to favorites!');
+    } catch (err) {
+      console.error(err);
+      alert('Error saving video to favorites');
+    }
+  };
 
   return (
     <div ref={ref} className="video-card">
       {source === 'library' ? (
-        // Only render the iframe when the component is in view.
-        inView ? (
-          <iframe
-            src={getEmbedUrl(videoSrc)}
-            className="video-player"
-            frameBorder="0"
-            allow="autoplay; fullscreen"
-            allowFullScreen
-            title="Library Video"
-          />
-        ) : (
-          // Render a placeholder (you could style this further or leave it empty)
-          <div className="video-placeholder" style={{ backgroundColor: '#000', height: '100%' }} />
-        )
+        // Render an iframe or placeholder if it's a library video
+        <div>Library video code here</div>
       ) : (
         <video
           ref={videoRef}
@@ -58,11 +91,18 @@ function VideoCard({ videoSrc, source, userName, description, likes: initialLike
         <p>@{userName}</p>
       </div>
       <div className="video-actions">
-        <button className="like-btn" onClick={handleLike}>
+        <button>
+          <img className="img-styling" src={'/images/profile-Pic.png'} alt="Profile" />
+        </button>
+        <button onClick={handleLike}>
           <FaHeart /> {likes}
         </button>
-        <button className="comment-btn">
+        <button onClick={handleComment}>
           <FaComment />
+        </button>
+        {/* NEW Save Button */}
+        <button onClick={handleSaveToFavorites}>
+          <FaBookmark />
         </button>
       </div>
     </div>

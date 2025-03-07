@@ -4,12 +4,7 @@
   background: linear-gradient(135deg, #6a0dad, #4b0082, #ff4500, #ff6347);
   background-size: 300% 300%;
   animation: gradientAnimation 15s ease infinite;
-  min-height: 100vh;
   padding: 20px;
-  justify-content: center !important;
-  flex-direction: column;
-  display: flex !important;
-  padding-bottom: 80px;
 }
 
   

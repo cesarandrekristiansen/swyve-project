@@ -43,6 +43,27 @@ app.use(cors(corsOptions));
 // Parse JSON bodies for incoming requests
 app.use(bodyParser.json());
 
+async function getOrCreateFavoritesPlaylist(userId, pool) {
+  // 1) Check if a "Favorites" playlist already exists for this user
+  const checkResult = await pool.query(
+    'SELECT id FROM playlists WHERE user_id = $1 AND name = $2 LIMIT 1',
+    [userId, 'Favorites']
+  );
+  if (checkResult.rows.length > 0) {
+    // Found it
+    return checkResult.rows[0].id;
+  }
+
+  // 2) Create it if it doesn't exist
+  const insertResult = await pool.query(
+    'INSERT INTO playlists (user_id, name) VALUES ($1, $2) RETURNING id',
+    [userId, 'Favorites']
+  );
+  return insertResult.rows[0].id;
+}
+
+
+
 /* ============================================================
    1. User Registration Endpoint
    ============================================================ */
@@ -235,6 +256,63 @@ app.get('/api/users/:userId/videos', async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+app.post('/api/favorites', async (req, res) => {
+  const { userId, videoId } = req.body;
+  if (!userId || !videoId) {
+    return res.status(400).json({ error: 'userId and videoId are required' });
+  }
+
+  try {
+    // 1) Get or create the user's "Favorites" playlist
+    const favoritesId = await getOrCreateFavoritesPlaylist(userId, pool);
+
+    // 2) Insert (playlist_id, video_id) into playlist_videos
+    //    Use "ON CONFLICT DO NOTHING" if you added the unique constraint
+    await pool.query(
+      `INSERT INTO playlist_videos (playlist_id, video_id)
+       VALUES ($1, $2)
+       ON CONFLICT DO NOTHING`,
+      [favoritesId, videoId]
+    );
+
+    return res.status(200).json({ message: 'Video saved to favorites!' });
+  } catch (error) {
+    console.error('Error saving favorite:', error);
+    return res.status(500).json({ error: 'Failed to save video to favorites' });
+  }
+});
+
+// GET /api/playlists/:playlistId/videos
+app.get('/api/playlists/:playlistId/videos', async (req, res) => {
+  const { playlistId } = req.params;
+
+  try {
+    // Optional: verify the playlist exists
+    const playlistCheck = await pool.query(
+      'SELECT * FROM playlists WHERE id = $1',
+      [playlistId]
+    );
+    if (playlistCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Playlist not found' });
+    }
+
+    // Fetch the videos for this playlist by joining playlist_videos and videos
+    const videosResult = await pool.query(`
+      SELECT v.*
+      FROM playlist_videos pv
+      JOIN videos v ON pv.video_id = v.id
+      WHERE pv.playlist_id = $1
+      ORDER BY v.id DESC
+    `, [playlistId]);
+
+    return res.json(videosResult.rows);
+  } catch (error) {
+    console.error('Error fetching playlist videos:', error);
+    return res.status(500).json({ error: 'Failed to fetch playlist videos' });
+  }
+});
+
 
   
 

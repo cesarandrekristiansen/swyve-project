@@ -1,5 +1,6 @@
+// App.js
 import React, { useState } from 'react';
-import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import './App.css';
 import SplashScreen from './components/splashscreen/SplashScreen';
 import Feed from './pages/feed/Feed';
@@ -7,86 +8,67 @@ import Profile from './pages/profile/Profile';
 import Upload from './pages/upload/Upload';
 import Inbox from './pages/inbox/Inbox';
 import Register from './pages/landingPage/register/Register';
-import Login from './pages/landingPage/login/Login';
 import LandingPage from './pages/landingPage/LandingPage';
 import Trending from './pages/trending/Trending';
 import Stats from './Stats';
 import ProtectedRoute from './components/ProtectedRoute';
-import {
-  FaHome,
-  FaPlusCircle,
-  FaEnvelope,
-  FaUser,
-  FaFire,
-  FaSyncAlt,
-  FaSearch,
-} from 'react-icons/fa';
+import { FaHome, FaPlusCircle, FaEnvelope, FaUser, FaSearch } from 'react-icons/fa';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [infiniteScroll, setInfiniteScroll] = useState(false);
   const location = useLocation();
   const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+  const guest = localStorage.getItem('guest');
+  const navigate = useNavigate();
 
 
   const handleSplashFinish = () => {
     setShowSplash(false);
+    navigate('/feed');
   };
-
-  const toggleInfiniteScroll = () => {
-    setInfiniteScroll((prev) => !prev);
-  };
-
-  const isVideoPage = location.pathname === '/' || location.pathname === '/following';
-  const iconStyle = { transition: 'transform 0.2s ease', fontSize: '24px' };
-  const token = localStorage.getItem('token');
-
 
   return (
     <div className="app">
-      {/* Public Routes */}
-      <Routes>
-        <Route path="/landing" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      {/* Main content area */}
+      <div className="main-content">
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/feed" element={<Feed infiniteScroll={infiniteScroll} />} />
 
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/splash" element={<SplashScreen onFinish={handleSplashFinish} />} />
-          <Route path="/" element={showSplash ? <SplashScreen onFinish={handleSplashFinish} /> : <Feed infiniteScroll={infiniteScroll} />} />
-          <Route path="/following" element={<Feed infiniteScroll={infiniteScroll} />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/inbox" element={<Inbox />} />
-          <Route path="/profile/:profileId" element={<Profile />} />
-          <Route path="/trending" element={<Trending />} />
-          <Route path="/stats" element={<Stats />} />
-        </Route>
-      </Routes>
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/splash" element={<SplashScreen onFinish={handleSplashFinish} />} />
+            <Route path="/upload" element={<Upload />} />
+            <Route path="/inbox" element={<Inbox />} />
+            <Route path="/profile/:profileId" element={<Profile />} />
+            <Route path="/trending" element={<Trending />} />
+            <Route path="/stats" element={<Stats />} />
+          </Route>
+        </Routes>
+      </div>
 
-      {isVideoPage && (
-        <button className="infinite-scroll-icon" onClick={toggleInfiniteScroll}>
-          <FaSyncAlt style={{ color: infiniteScroll ? '#00ff00' : '#ffffff', fontSize: '20px' }} />
-        </button>
-      )}
-
-      {token && (
+      {/* Bottom navigation – show only for logged-in users */}
+      {(token || guest) && (
         <div className="bottom-nav">
-          <NavLink to="/trending" className="nav-item">
-            <FaSearch style={iconStyle} />
+          <NavLink to="/feed" className="nav-item">
+            <FaHome />
           </NavLink>
-          <NavLink to="/" className="nav-item">
-            <FaHome style={iconStyle} />
+          <NavLink to="/trending" className="nav-item">
+            <FaSearch />
           </NavLink>
           <NavLink to="/upload" className="nav-item upload-btn">
-            <FaPlusCircle style={{ ...iconStyle, fontSize: '28px' }} />
+            <FaPlusCircle />
           </NavLink>
           <NavLink to="/inbox" className="nav-item">
-            <FaEnvelope style={iconStyle} />
+            <FaEnvelope />
           </NavLink>
-          <NavLink to={`/profile/${userId}`} className="nav-item">
-            <FaUser style={iconStyle} />
+          <NavLink to={userId ? `/profile/${userId}` : '/'} className="nav-item">
+            <FaUser />
           </NavLink>
-
         </div>
       )}
     </div>

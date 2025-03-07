@@ -7,6 +7,7 @@ function Feed() {
   const [videos, setVideos] = useState([]);
   const [watchedVideos, setWatchedVideos] = useState(0);
 
+
    // Get backend URL from environment variable (fallback to localhost for dev)
    const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
@@ -65,24 +66,25 @@ function Feed() {
 
   return (
     <div className="feed">
-      {/* Toggle for infinite scroll */}
+      {/* Toggle for infinite scroll 
       <button onClick={toggleInfiniteScroll} className="infinite-scroll-toggle">
         {infiniteScroll ? 'Disable Infinite Scroll' : 'Enable Infinite Scroll'}
-      </button>
+      </button>*/}
 
       {/* Video feed */}
       {videos.map((video) => (
-  <VideoCard
-    key={video.id}
-    videoSrc={video.url}  // Use the URL from the DB
-    source={video.source} // Pass the source property (e.g., "library" or "user")
-    userName={"Uploader"} // Default uploader name; adjust as needed
-    description={video.title} // Use the title as the description
-    likes={video.likes || 0}
-    comments={video.comments || 0}
-    onVideoEnd={() => setWatchedVideos(prev => prev + 1)}
-  />
-))}
+        <VideoCard
+          key={video.id}
+          videoId={video.id}          // <-- Pass the video ID
+          videoSrc={video.url}  // Use the URL from the DB
+          source={video.source} // Pass the source property (e.g., "library" or "user")
+          userName={"Uploader"}
+          description={video.title} // Use the title as the description
+          likes={video.likes || 0}
+          comments={video.comments || 0}
+          onVideoEnd={() => setWatchedVideos(prev => prev + 1)}
+        />
+      ))}
 
     </div>
   );

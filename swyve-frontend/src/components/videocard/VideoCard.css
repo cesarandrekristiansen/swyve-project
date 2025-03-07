@@ -3,3 +3,30 @@
     height: 100vh; /* Full screen height */
     object-fit: cover; /* Crop video to fit */
   }
+
+  .video-actions button {
+    background: none !important;    /* or background: transparent !important; */
+    box-shadow: none !important;    /* remove any shadows if present */
+    border: none;                   /* remove border if you want */
+    color: white;                   /* keep icon/text white */
+    border-radius: 50%;             /* keep them round if desired */
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+  
+  .video-actions button:hover {
+    background: none !important;    /* no background on hover either */
+  }
+
+  .img-styling{
+    height: 50px;
+    width: 50px;
+    border: 0;
+    border-radius: 50%;
+  }

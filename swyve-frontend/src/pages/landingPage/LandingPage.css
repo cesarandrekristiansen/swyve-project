@@ -1,32 +1,143 @@
-.landing-page {
+/* LandingPage.css */
+
+/* Container for the two columns */
+.landing-container {
+  display: flex;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Left column: gradient or background image with brand text */
+.landing-left {
+  flex: 1;
+  background: linear-gradient(135deg, #ff4500, #ff6347, #6a0dad);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Center the brand text/logo */
+.brand-section {
+  text-align: center;
+  color: white;
+  max-width: 300px;
+  margin: 0 20px;
+}
+
+.brand-section .logo {
+  width: 120px; /* Adjust as needed */
+  margin-bottom: 20px;
+}
+
+/* Right column: white background with the login form */
+.landing-right {
+  flex: 1;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+/* Login form container */
+.login-form {
+  width: 80%;
+  max-width: 350px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  padding: 20px;
-  text-align: center;
-  background: linear-gradient(135deg, #6a0dad, #ff4500, #4b0082, #ff6347);
-  color: #fff;
 }
 
-.landing-buttons {
-  margin-top: 20px;
+/* Form heading */
+.login-form h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
 }
 
-.landing-buttons button {
-  margin: 0 10px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  cursor: pointer;
+/* Inputs */
+.login-form input {
+  margin-bottom: 15px;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  outline: none;
+  width: 100%;
+}
+
+/* Forgot password link */
+.forgot-password {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.forgot-password a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Login button */
+.login-form button {
+  padding: 12px;
+  border-radius: 25px;
   border: none;
-  border-radius: 4px;
-  background-color: #00ff00;
-  color: #fff; /* White text on buttons */
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  background: #ff4500;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background 0.3s ease;
 }
 
-.landing-buttons button:hover {
-  background-color: #00cc00;
-  transform: scale(1.05);
+.login-form button:hover {
+  background: #ff6347;
+}
+
+/* Error/success message */
+.login-message {
+  color: red;
+  margin-bottom: 10px;
+}
+
+/* Terms text below the button */
+.terms-text {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.terms-text a {
+  color: #ff4500;
+  text-decoration: none;
+}
+
+/* Sign up / guest links */
+.login-links {
+  text-align: center;
+}
+
+.login-links a,
+.register-link {
+  color: #ff4500;
+  text-decoration: none;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.login-links a:hover,
+.register-link:hover {
+  text-decoration: underline;
+}
+
+.logo-title-row {
+  display: flex;
+  align-items: center;
+  gap: 18px; /* adjust as needed */
+}
+
+.logo-title-row h1 {
+  font-size: 3rem; /* You can adjust this value as needed */
 }

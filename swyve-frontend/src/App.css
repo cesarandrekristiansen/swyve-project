@@ -1,12 +1,26 @@
 /* Global stil med dynamisk bakgrunn */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow: hidden;
+
   background: linear-gradient(135deg, #6a0dad, #ff4500, #4b0082, #ff6347);
   background-size: 300% 300%;
   animation: gradientAnimation 10s ease infinite; /* Dynamisk animasjon */
   color: white;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 80px; /* Enough space so the bottom nav doesn't cover content */
 }
 
 /* Animasjon for gradient */
@@ -18,6 +32,11 @@
 
 /* Bunnnavigasjon */
 .bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -25,10 +44,6 @@
   background-size: 200% 200%;
   animation: gradientAnimation 8s ease infinite;
   padding: 10px 0;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  z-index: 100;
   border-top: 1px solid #ffffff;
 }
 

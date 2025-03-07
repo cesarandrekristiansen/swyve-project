@@ -12,6 +12,9 @@ function Profile() {
   const [error, setError] = useState(null);
 
   const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
+  // State to store the favorited videos
+const [favoritesVideos, setFavoritesVideos] = useState([]);
+
 
   // 2) Fetch streak for this user (if needed)
   useEffect(() => {
@@ -35,6 +38,16 @@ function Profile() {
       .catch((error) => console.error('Error fetching playlists:', error));
   }, [BASE_URL, profileId]);
 
+  // In Profile.js
+useEffect(() => {
+  if (!profileId) return;
+  fetch(`${BASE_URL}/api/playlists?userId=${profileId}`)
+    .then((res) => res.json())
+    .then((data) => setPlaylists(data))
+    .catch((error) => console.error('Error fetching playlists:', error));
+}, [BASE_URL, profileId]);
+
+
   // 4) Fetch only this user’s videos from the new endpoint
   useEffect(() => {
     if (!profileId) return;
@@ -57,6 +70,29 @@ function Profile() {
         setError(err.message);
       });
   }, [BASE_URL, profileId]);
+
+  useEffect(() => {
+    // 1) Once playlists are loaded, find the "Favorites" playlist
+    const favoritesPlaylist = playlists.find((p) => p.name === 'Favorites');
+    if (!favoritesPlaylist) return; // If user hasn't saved anything yet
+  
+    // 2) Fetch videos in that playlist using our new endpoint
+    fetch(`${BASE_URL}/api/playlists/${favoritesPlaylist.id}/videos`)
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((data) => {
+            throw new Error(data.error || 'Error fetching favorites');
+          });
+        }
+        return res.json();
+      })
+      .then((videos) => {
+        console.log('Fetched favorites videos:', videos);
+        setFavoritesVideos(videos);
+      })
+      .catch((err) => console.error(err));
+  }, [playlists, BASE_URL]);
+  
 
   // 5) Mock user info (for demonstration)
   //    In a real app, you might fetch user info from an endpoint, e.g. /api/users/:id
@@ -103,14 +139,29 @@ function Profile() {
 
       {/* Playlists */}
       <div className="playlists-section">
+        {/* Favorite Videos Gallery */}
+        <div className="video-gallery">
+          <h2>Your Favorite Videos</h2>
+          {favoritesVideos.map((video) => (
+            <div key={video.id} className="video-thumbnail">
+              <video
+                src={video.url}
+                controls
+                muted
+                poster={video.thumbnail || '/images/default-thumbnail.jpg'}
+                style={{ backgroundColor: '#000' }}
+              />
+            </div>
+          ))}
+        </div>
         <h2>Your Playlists</h2>
-        <div className="playlists">
+        {/*<div className="playlists">
           {playlists.map((playlist) => (
             <div key={playlist.id} className="playlist">
               <h3>{playlist.name}</h3>
             </div>
           ))}
-        </div>
+        </div>*/}
       </div>
 
       {/* Video gallery */}
