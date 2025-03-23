@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Register.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Register.css";
 
 function Register() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   // Use backend URL from environment variable, fallback to localhost if not set.
@@ -15,21 +15,21 @@ function Register() {
   const handleRegister = async () => {
     try {
       const response = await fetch(`${backendUrl}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, username }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        setMessage('User registered successfully!');
+        setMessage("User registered successfully!");
         // Redirect to login page after successful registration
-        navigate('/login');
+        navigate("/");
       } else {
-        setMessage(data.error || 'Registration failed.');
+        setMessage(data.error || "Registration failed.");
       }
     } catch (error) {
-      setMessage('Error registering user.');
+      setMessage("Error registering user.");
     }
   };
 

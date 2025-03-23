@@ -1,5 +1,6 @@
 /* Global stil med dynamisk bakgrunn */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -20,14 +21,19 @@ html, body {
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 80px; /* Enough space so the bottom nav doesn't cover content */
 }
 
 /* Animasjon for gradient */
 @keyframes gradientAnimation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Bunnnavigasjon */
@@ -44,7 +50,6 @@ html, body {
   background-size: 200% 200%;
   animation: gradientAnimation 8s ease infinite;
   padding: 10px 0;
-  border-top: 1px solid #ffffff;
 }
 
 .nav-item {
@@ -79,7 +84,8 @@ html, body {
 }
 
 /* Globale knapper */
-button, .nav-item {
+button,
+.nav-item {
   background: linear-gradient(135deg, #6a0dad, #ff4500);
   color: white;
   border: none;
@@ -90,12 +96,14 @@ button, .nav-item {
   transition: transform 0.2s ease, background 0.3s ease;
 }
 
-button:hover, .nav-item:hover {
+button:hover,
+.nav-item:hover {
   background: linear-gradient(135deg, #ff4500, #6a0dad);
   transform: scale(1.05);
 }
 
-button:active, .nav-item:active {
+button:active,
+.nav-item:active {
   transform: scale(0.95);
 }
 

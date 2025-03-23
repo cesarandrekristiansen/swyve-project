@@ -1,17 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { useInView } from 'react-intersection-observer';
-import { FaHeart, FaComment, FaBookmark } from 'react-icons/fa';
-import './VideoCard.css';
+import React, { useRef, useState, useEffect } from "react";
+import { useInView } from "react-intersection-observer";
+import { FaHeart, FaComment, FaBookmark } from "react-icons/fa";
+import "./VideoCard.css";
 
-function VideoCard({ 
+function VideoCard({
   videoId,
-  videoSrc, 
-  source, 
-  userName, 
-  description, 
-  likes: initialLikes, 
-  comments, 
-  onVideoEnd 
+  videoSrc,
+  source,
+  userName,
+  description,
+  likes: initialLikes,
+  comments,
+  onVideoEnd,
 }) {
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
@@ -19,7 +19,7 @@ function VideoCard({
 
   useEffect(() => {
     // If source !== 'library', play/pause the <video> using the intersection observer
-    if (source !== 'library' && videoRef.current) {
+    if (source !== "library" && videoRef.current) {
       if (inView) {
         videoRef.current.play();
       } else {
@@ -29,51 +29,52 @@ function VideoCard({
   }, [inView, source]);
 
   const handleLike = () => {
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (!userId) {
-      alert('Please log in to like.');
+      alert("Please log in to like.");
       return;
     }
-    setLikes(prev => prev + 1);
+    setLikes((prev) => prev + 1);
   };
 
   const handleComment = () => {
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (!userId) {
-      alert('Please log in to comment.');
+      alert("Please log in to comment.");
       return;
     }
-    alert('Comment functionality not implemented.');
-  }
+    alert("Comment functionality not implemented.");
+  };
 
   // NEW: Save to Favorites
   const handleSaveToFavorites = async () => {
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (!userId) {
-      alert('Please log in to save favorites.');
+      alert("Please log in to save favorites.");
       return;
     }
     try {
-      const backendUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
+      const backendUrl =
+        process.env.REACT_APP_BASE_URL || "http://localhost:5000";
       const res = await fetch(`${backendUrl}/api/favorites`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, videoId })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, videoId }),
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to save video');
+        throw new Error(data.error || "Failed to save video");
       }
-      alert('Video saved to favorites!');
+      alert("Video saved to favorites!");
     } catch (err) {
       console.error(err);
-      alert('Error saving video to favorites');
+      alert("Error saving video to favorites");
     }
   };
 
   return (
     <div ref={ref} className="video-card">
-      {source === 'library' ? (
+      {source === "library" ? (
         // Render an iframe or placeholder if it's a library video
         <div>Library video code here</div>
       ) : (
@@ -92,7 +93,11 @@ function VideoCard({
       </div>
       <div className="video-actions">
         <button>
-          <img className="img-styling" src={'/images/profile-Pic.png'} alt="Profile" />
+          <img
+            className="img-styling"
+            src={"/images/profile-Pic.png"}
+            alt="Profile"
+          />
         </button>
         <button onClick={handleLike}>
           <FaHeart /> {likes}

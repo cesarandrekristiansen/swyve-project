@@ -1,7 +1,6 @@
-
 .splash-screen {
   display: flex;
-  flex-direction: column;  /* Stack items vertically */
+  flex-direction: column; /* Stack items vertically */
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -13,7 +12,7 @@
 }
 
 .splash-logo {
-  width: 180px;      /* Adjusted for a slightly larger logo */
+  width: 180px; /* Adjusted for a slightly larger logo */
   margin-bottom: 20px;
   animation: scaleUp 1.5s ease-in-out;
 }
@@ -30,11 +29,9 @@
   border: none;
   border-radius: 8px;
   background-color: #00ff00;
-  color: #fff;            /* White text on the button */
+  color: #fff; /* White text on the button */
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
-
-
 
 /* Animations */
 @keyframes scaleUp {
@@ -49,6 +46,10 @@
 }
 
 @keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

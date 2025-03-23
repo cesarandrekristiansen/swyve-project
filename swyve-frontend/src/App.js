@@ -1,32 +1,44 @@
 // App.js
-import React, { useState } from 'react';
-import { Routes, Route, NavLink, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import './App.css';
-import SplashScreen from './components/splashscreen/SplashScreen';
-import Feed from './pages/feed/Feed';
-import Profile from './pages/profile/Profile';
-import Upload from './pages/upload/Upload';
-import Inbox from './pages/inbox/Inbox';
-import Register from './pages/landingPage/register/Register';
-import LandingPage from './pages/landingPage/LandingPage';
-import Trending from './pages/trending/Trending';
-import Stats from './Stats';
-import ProtectedRoute from './components/ProtectedRoute';
-import { FaHome, FaPlusCircle, FaEnvelope, FaUser, FaSearch } from 'react-icons/fa';
+import React, { useState } from "react";
+import {
+  Routes,
+  Route,
+  NavLink,
+  useLocation,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
+import "./App.css";
+import SplashScreen from "./components/splashscreen/SplashScreen";
+import Feed from "./pages/feed/Feed";
+import Profile from "./pages/profile/Profile";
+import Upload from "./pages/upload/Upload";
+import Inbox from "./pages/inbox/Inbox";
+import Register from "./pages/landingPage/register/Register";
+import LandingPage from "./pages/landingPage/LandingPage";
+import Trending from "./pages/trending/Trending";
+import Stats from "./Stats";
+import ProtectedRoute from "./components/ProtectedRoute";
+import {
+  FaHome,
+  FaPlusCircle,
+  FaEnvelope,
+  FaUser,
+  FaSearch,
+} from "react-icons/fa";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [infiniteScroll, setInfiniteScroll] = useState(false);
   const location = useLocation();
-  const userId = localStorage.getItem('userId');
-  const token = localStorage.getItem('token');
-  const guest = localStorage.getItem('guest');
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  const guest = localStorage.getItem("guest");
   const navigate = useNavigate();
-
 
   const handleSplashFinish = () => {
     setShowSplash(false);
-    navigate('/feed');
+    navigate("/feed");
   };
 
   return (
@@ -37,11 +49,17 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/feed" element={<Feed infiniteScroll={infiniteScroll} />} />
+          <Route
+            path="/feed"
+            element={<Feed infiniteScroll={infiniteScroll} />}
+          />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/splash" element={<SplashScreen onFinish={handleSplashFinish} />} />
+            <Route
+              path="/splash"
+              element={<SplashScreen onFinish={handleSplashFinish} />}
+            />
             <Route path="/upload" element={<Upload />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile/:profileId" element={<Profile />} />
@@ -66,7 +84,10 @@ function App() {
           <NavLink to="/inbox" className="nav-item">
             <FaEnvelope />
           </NavLink>
-          <NavLink to={userId ? `/profile/${userId}` : '/'} className="nav-item">
+          <NavLink
+            to={userId ? `/profile/${userId}` : "/"}
+            className="nav-item"
+          >
             <FaUser />
           </NavLink>
         </div>
