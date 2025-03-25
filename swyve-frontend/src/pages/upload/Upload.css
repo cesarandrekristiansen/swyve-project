@@ -1,64 +1,208 @@
+/* ========== GLOBAL & MOBILE-FIRST STYLES ========== */
+
+/* Use Montserrat (or any other modern font) */
+body,
+.upload-page,
+.upload-form {
+  font-family: "Montserrat", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* 
+  Page container with gradient background,
+  and some top margin so content sits a bit lower.
+*/
 .upload-page {
-    background: linear-gradient(135deg, #4b0082, #ff6347);
-    color: white;
-    padding: 20px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
+  background: linear-gradient(135deg, #4b0082, #ff6347);
+  color: white;
+  min-height: 100vh;
+  padding: 60px 20px 20px; /* extra top padding to lower the content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Main title */
+.upload-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Form container: stacked, mobile-first */
+.upload-form {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Error text styling */
+.upload-error {
+  color: #ff6666;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Basic text inputs */
+.upload-input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: #333;
+  background: #fff;
+}
+
+/* File input: hidden real input & visible label */
+.file-input-container {
+  width: 100%;
+  position: relative;
+}
+#real-file-input {
+  display: none;
+}
+.file-input-label {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  text-align: center;
+  background: #fff;
+  color: #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+.file-input-label:hover {
+  transform: scale(1.02);
+  background: #f0f0f0;
+}
+
+/* Tag input + "Add" button row */
+.tag-input-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+/* 
+  "Add" button: same gradient style as "Upload," but smaller 
+  so there's still a hierarchy.
+*/
+.add-tag-btn {
+  background: linear-gradient(135deg, #ff4500, #6a0dad);
+  color: #fff;
+  border: none;
+  padding: 0 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+.add-tag-btn:hover {
+  transform: scale(1.03);
+  background: linear-gradient(135deg, #6a0dad, #ff4500);
+}
+
+/* Tag list (flex wrap) */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-start;
+  margin-top: 5px;
+}
+
+/* Tag items: single colors from the theme, no gradient */
+.tag-item {
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  /* default fallback color if nth-child doesn't match */
+  background: #6a0dad;
+}
+
+/* Alternate among the 4 theme colors */
+.tag-list .tag-item:nth-child(4n + 1) {
+  background: #ff4500; /* orange */
+}
+.tag-list .tag-item:nth-child(4n + 2) {
+  background: #6a0dad; /* purple */
+}
+.tag-list .tag-item:nth-child(4n + 3) {
+  background: #ff6347; /* tomato */
+}
+.tag-list .tag-item:nth-child(4n + 4) {
+  background: #4b0082; /* indigo */
+}
+
+/* Tag "X" button */
+.tag-remove-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+}
+.tag-remove-btn:hover {
+  color: #ffcccc;
+}
+
+/* The main "Upload" button (bigger & gradient) */
+.upload-btn {
+  background: linear-gradient(135deg, #ff4500, #6a0dad);
+  color: #fff;
+  border: none;
+  padding: 14px 25px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+  margin-top: 5px;
+}
+.upload-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #6a0dad, #ff4500);
+}
+
+/* ========== MEDIA QUERIES FOR LARGER SCREENS ========== */
+@media (min-width: 850px) {
   .upload-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
+    font-size: 2.4rem;
+    margin-bottom: 30px;
   }
-  
   .upload-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    gap: 20px;
   }
-  
-  .upload-input, .upload-file-input {
-    width: 100%;
-    padding: 10px;
+  .add-tag-btn {
     font-size: 1rem;
-    border-radius: 5px;
-    border: none;
-    outline: none;
-    color: #333;
+    padding: 0 24px;
   }
-  
-  .upload-input {
-    background: white;
-  }
-  
-  .upload-file-input {
-    background: #eee;
-  }
-  
   .upload-btn {
-    background: linear-gradient(135deg, #ff4500, #6a0dad);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.2s ease, background 0.3s ease;
+    font-size: 1.1rem;
+    padding: 16px 30px;
   }
-  
-  .upload-btn:hover {
-    transform: scale(1.1);
-    background: linear-gradient(135deg, #6a0dad, #ff4500);
-  }
-  
+}

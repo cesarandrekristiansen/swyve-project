@@ -1,48 +1,58 @@
 /* LandingPage.css */
 
-/* Container for the two columns */
+/* 1) MOBILE-FIRST STYLES (Default) */
+
 .landing-container {
   display: flex;
-  height: 100vh;
+  flex-direction: column; /* stack top-to-bottom on mobile */
   margin: 0;
   padding: 0;
+  /* On mobile, we might not force a full viewport height:
+     If you want a scrollable design, omit the fixed height. */
+  /* height: 100vh; */
 }
 
-/* Left column: gradient or background image with brand text */
+/* "Left" section - brand area. On mobile, it’s just the top. */
 .landing-left {
-  flex: 1;
+  /* We give it a nice gradient background or color. */
   background: linear-gradient(135deg, #ff4500, #ff6347, #6a0dad);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 20px; /* add some padding so content doesn’t feel squished */
 }
 
-/* Center the brand text/logo */
+/* Brand text and logo styling */
 .brand-section {
   text-align: center;
   color: white;
   max-width: 300px;
-  margin: 0 20px;
+  margin: 0 auto;
 }
 
-.brand-section .logo {
-  width: 120px; /* Adjust as needed */
-  margin-bottom: 20px;
+.logo-title-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
-/* Right column: white background with the login form */
+.logo-title-row h1 {
+  font-size: 2rem; /* smaller for mobile */
+}
+
+/* "Right" section - login form. On mobile, this is just below the brand */
 .landing-right {
-  flex: 1;
   background-color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333;
+  padding: 20px; /* some space around the form on mobile */
 }
 
-/* Login form container */
+/* The login form container */
 .login-form {
-  width: 80%;
+  width: 100%;
   max-width: 350px;
   display: flex;
   flex-direction: column;
@@ -132,12 +142,23 @@
   text-decoration: underline;
 }
 
-.logo-title-row {
-  display: flex;
-  align-items: center;
-  gap: 18px; /* adjust as needed */
-}
+/* 2) MEDIA QUERY FOR LARGER SCREENS (DESKTOP/TABLETS) */
+@media (min-width: 850px) {
+  .landing-container {
+    flex-direction: row; /* side-by-side */
+    height: 100vh; /* fill the viewport in desktop */
+  }
 
-.logo-title-row h1 {
-  font-size: 3rem; /* You can adjust this value as needed */
+  .landing-left {
+    flex: 1; /* take up half the space */
+    padding: 40px; /* bigger padding on desktop */
+  }
+
+  .logo-title-row h1 {
+    font-size: 3rem; /* bigger text on desktop */
+  }
+
+  .landing-right {
+    flex: 1; /* take up half the space */
+  }
 }

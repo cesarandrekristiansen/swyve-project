@@ -64,7 +64,7 @@
 /* Action buttons (like, comment, etc.) */
 .video-actions {
   position: absolute;
-  top: 77%;
+  top: 60%;
   right: 2px;
   transform: translateY(-50%);
   display: flex;
