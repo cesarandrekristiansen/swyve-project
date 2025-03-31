@@ -36,7 +36,7 @@ const corsOptions = {
   origin: [
     "https://swyve-frontend.onrender.com",
     "http://localhost:3000",
-    "https://swyve.io/",
+    "https://swyve.io",
   ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
