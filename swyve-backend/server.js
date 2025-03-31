@@ -33,7 +33,11 @@ pool.query("SELECT NOW()", (err, res) => {
 
 // Configure CORS to allow requests from your frontend on Render
 const corsOptions = {
-  origin: ["https://swyve-frontend.onrender.com", "http://localhost:3000"],
+  origin: [
+    "https://swyve-frontend.onrender.com",
+    "http://localhost:3000",
+    "https://swyve.io/",
+  ],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
