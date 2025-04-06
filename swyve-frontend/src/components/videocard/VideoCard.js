@@ -58,6 +58,7 @@ function VideoCard({
         process.env.REACT_APP_BASE_URL || "http://localhost:5000";
       const res = await fetch(`${backendUrl}/api/favorites`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, videoId }),
       });

@@ -1,9 +1,9 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem('token');
-  return token ? <Outlet /> : <Navigate to="/" />;
+  const userId = localStorage.getItem("userId");
+  return userId ? <Outlet /> : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import './Profile.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import "./Profile.css";
 
 function Profile() {
   // 1) Read userId from the URL, e.g. /profile/4 => profileId = "4"
@@ -10,59 +10,65 @@ function Profile() {
   const [playlists, setPlaylists] = useState([]);
   const [userVideos, setUserVideos] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
+  const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
   // State to store the favorited videos
-const [favoritesVideos, setFavoritesVideos] = useState([]);
-
+  const [favoritesVideos, setFavoritesVideos] = useState([]);
 
   // 2) Fetch streak for this user (if needed)
   useEffect(() => {
     if (!profileId) return; // If no user ID, do nothing
     fetch(`${BASE_URL}/streak`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: profileId }),
     })
       .then((res) => res.json())
       .then((data) => setStreak(data.streakCount || 0))
-      .catch((error) => console.error('Error fetching streak:', error));
+      .catch((error) => console.error("Error fetching streak:", error));
   }, [BASE_URL, profileId]);
 
   // 3) Fetch playlists for this user (if you want)
   useEffect(() => {
     if (!profileId) return;
-    fetch(`${BASE_URL}/api/playlists?userId=${profileId}`)
+    fetch(`${BASE_URL}/api/playlists?userId=${profileId}`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => setPlaylists(data))
-      .catch((error) => console.error('Error fetching playlists:', error));
+      .catch((error) => console.error("Error fetching playlists:", error));
   }, [BASE_URL, profileId]);
 
   // In Profile.js
-useEffect(() => {
-  if (!profileId) return;
-  fetch(`${BASE_URL}/api/playlists?userId=${profileId}`)
-    .then((res) => res.json())
-    .then((data) => setPlaylists(data))
-    .catch((error) => console.error('Error fetching playlists:', error));
-}, [BASE_URL, profileId]);
-
+  useEffect(() => {
+    if (!profileId) return;
+    fetch(`${BASE_URL}/api/playlists?userId=${profileId}`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => setPlaylists(data))
+      .catch((error) => console.error("Error fetching playlists:", error));
+  }, [BASE_URL, profileId]);
 
   // 4) Fetch only this user’s videos from the new endpoint
   useEffect(() => {
     if (!profileId) return;
-    fetch(`${BASE_URL}/api/users/${profileId}/videos`)
+    fetch(`${BASE_URL}/api/users/${profileId}/videos`, {
+      credentials: "include",
+    })
       .then((res) => {
         if (!res.ok) {
           // If user not found or some error
           return res.json().then((data) => {
-            throw new Error(data.error || 'Error fetching videos');
+            throw new Error(data.error || "Error fetching videos");
           });
         }
         return res.json();
       })
       .then((videos) => {
-        console.log('Fetched user videos:', videos);
+        console.log("Fetched user videos:", videos);
         setUserVideos(videos);
       })
       .catch((err) => {
@@ -73,26 +79,31 @@ useEffect(() => {
 
   useEffect(() => {
     // 1) Once playlists are loaded, find the "Favorites" playlist
-    const favoritesPlaylist = playlists.find((p) => p.name === 'Favorites');
+    const favoritesPlaylist = playlists.find((p) => p.name === "Favorites");
     if (!favoritesPlaylist) return; // If user hasn't saved anything yet
-  
+
     // 2) Fetch videos in that playlist using our new endpoint
-    fetch(`${BASE_URL}/api/playlists/${favoritesPlaylist.id}/videos`)
+    fetch(
+      `${BASE_URL}/api/playlists/${favoritesPlaylist.id}/videos`,
+
+      {
+        credentials: "include",
+      }
+    )
       .then((res) => {
         if (!res.ok) {
           return res.json().then((data) => {
-            throw new Error(data.error || 'Error fetching favorites');
+            throw new Error(data.error || "Error fetching favorites");
           });
         }
         return res.json();
       })
       .then((videos) => {
-        console.log('Fetched favorites videos:', videos);
+        console.log("Fetched favorites videos:", videos);
         setFavoritesVideos(videos);
       })
       .catch((err) => console.error(err));
   }, [playlists, BASE_URL]);
-  
 
   // 5) Mock user info (for demonstration)
   //    In a real app, you might fetch user info from an endpoint, e.g. /api/users/:id
@@ -101,13 +112,26 @@ useEffect(() => {
     followers: 1000,
     following: 150,
     likes: 5000,
-    profilePic: '/images/profile-Pic.png'
+    profilePic: "/images/profile-Pic.png",
   };
 
   // If there's an error (e.g. user not found), show it
   if (error) {
-    return <div style={{ color: 'white', padding: '20px' }}>Error: {error}</div>;
+    return (
+      <div style={{ color: "white", padding: "20px" }}>Error: {error}</div>
+    );
   }
+
+  const handleLogout = async () => {
+    await fetch(`${BASE_URL}/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    // clear localStorage items
+    localStorage.removeItem("userId");
+    // navigate to login
+    navigate("/");
+  };
 
   return (
     <div className="profile-page">
@@ -148,8 +172,8 @@ useEffect(() => {
                 src={video.url}
                 controls
                 muted
-                poster={video.thumbnail || '/images/default-thumbnail.jpg'}
-                style={{ backgroundColor: '#000' }}
+                poster={video.thumbnail || "/images/default-thumbnail.jpg"}
+                style={{ backgroundColor: "#000" }}
               />
             </div>
           ))}
@@ -174,8 +198,8 @@ useEffect(() => {
               src={video.url}
               controls
               muted
-              poster={video.thumbnail || '/images/default-thumbnail.jpg'}
-              style={{ backgroundColor: '#000' }}
+              poster={video.thumbnail || "/images/default-thumbnail.jpg"}
+              style={{ backgroundColor: "#000" }}
             />
           </div>
         ))}

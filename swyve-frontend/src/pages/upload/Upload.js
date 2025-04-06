@@ -55,6 +55,7 @@ function Upload() {
 
       const uploadRes = await fetch(`${url}/api/upload-video`, {
         method: "POST",
+        credentials: "include",
         body: formData,
       });
       const uploadData = await uploadRes.json();
@@ -72,6 +73,7 @@ function Upload() {
       const tagString = tags.join(",");
       const metadataRes = await fetch(`${url}/api/videos`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,

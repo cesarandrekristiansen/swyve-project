@@ -5,17 +5,21 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const { Pool } = require("pg");
+const cookieParser = require("cookie-parser");
+const authMiddleware = require("./authMiddleware");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
   next();
 });
+
+app.use(cookieParser());
 
 // Create a PostgreSQL connection pool using the Supabase connection string
 const pool = new Pool({
@@ -111,20 +115,38 @@ app.post("/login", async (req, res) => {
     }
     // Generate a JWT token for the user
     const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
-    res.status(200).send({
-      token,
-      username: user.username,
-      userId: user.id,
-    });
+
+    // INSTEAD OF sending it in JSON, we set a cookie:
+    res
+      .cookie("token", token, {
+        httpOnly: true, // So JavaScript can't read it
+        secure: false, // Change to true if you have HTTPS
+        sameSite: "lax", // or "none" if cross-site; "strict" if same-site only
+        maxAge: 60 * 60 * 1000, // 1 hour in ms
+      })
+      .status(200)
+      .json({
+        // You can still return user info if needed
+        username: user.username,
+        userId: user.id,
+      });
   } catch (error) {
     res.status(500).send({ error: "Error logging in" });
   }
 });
 
 /* ============================================================
+   2. User Logout Endpoint
+   ============================================================ */
+app.post("/logout", (req, res) => {
+  res.clearCookie("token");
+  return res.status(200).json({ message: "Logged out" });
+});
+
+/* ============================================================
    3. Update User Streak Endpoint
    ============================================================ */
-app.post("/streak", async (req, res) => {
+app.post("/streak", authMiddleware, async (req, res) => {
   const { userId } = req.body;
   const today = new Date().toISOString().split("T")[0]; // Format as YYYY-MM-DD
   try {
@@ -185,7 +207,7 @@ app.post("/streak", async (req, res) => {
 /* ============================================================
    4. Create Playlist Endpoint
    ============================================================ */
-app.post("/api/playlists", async (req, res) => {
+app.post("/api/playlists", authMiddleware, async (req, res) => {
   const { userId, name } = req.body;
   try {
     const result = await pool.query(
@@ -201,7 +223,7 @@ app.post("/api/playlists", async (req, res) => {
 /* ============================================================
    5. Get Playlists Endpoint
    ============================================================ */
-app.get("/api/playlists", async (req, res) => {
+app.get("/api/playlists", authMiddleware, async (req, res) => {
   const { userId } = req.query;
   try {
     const result = await pool.query(
@@ -217,7 +239,7 @@ app.get("/api/playlists", async (req, res) => {
 /* ============================================================
    6. Rewards Endpoint
    ============================================================ */
-app.post("/api/rewards", async (req, res) => {
+app.post("/api/rewards", authMiddleware, async (req, res) => {
   const { userId, watchedVideos } = req.body;
   try {
     if (watchedVideos % 10 === 0) {
@@ -231,7 +253,7 @@ app.post("/api/rewards", async (req, res) => {
   }
 });
 
-app.post("/api/videos", async (req, res) => {
+app.post("/api/videos", authMiddleware, async (req, res) => {
   const { title, thumbnail, duration, tags, embed_code, videoUrl, userId } =
     req.body;
   try {
@@ -260,7 +282,7 @@ app.get("/api/videos", async (req, res) => {
 });
 
 // 2) NEW endpoint: only videos for a given user
-app.get("/api/users/:userId/videos", async (req, res) => {
+app.get("/api/users/:userId/videos", authMiddleware, async (req, res) => {
   const { userId } = req.params;
   console.log(userId);
 
@@ -284,7 +306,7 @@ app.get("/api/users/:userId/videos", async (req, res) => {
   }
 });
 
-app.post("/api/favorites", async (req, res) => {
+app.post("/api/favorites", authMiddleware, async (req, res) => {
   const { userId, videoId } = req.body;
   if (!userId || !videoId) {
     return res.status(400).json({ error: "userId and videoId are required" });
@@ -311,37 +333,41 @@ app.post("/api/favorites", async (req, res) => {
 });
 
 // GET /api/playlists/:playlistId/videos
-app.get("/api/playlists/:playlistId/videos", async (req, res) => {
-  const { playlistId } = req.params;
+app.get(
+  "/api/playlists/:playlistId/videos",
+  authMiddleware,
+  async (req, res) => {
+    const { playlistId } = req.params;
 
-  try {
-    // Optional: verify the playlist exists
-    const playlistCheck = await pool.query(
-      "SELECT * FROM playlists WHERE id = $1",
-      [playlistId]
-    );
-    if (playlistCheck.rows.length === 0) {
-      return res.status(404).json({ error: "Playlist not found" });
-    }
+    try {
+      // Optional: verify the playlist exists
+      const playlistCheck = await pool.query(
+        "SELECT * FROM playlists WHERE id = $1",
+        [playlistId]
+      );
+      if (playlistCheck.rows.length === 0) {
+        return res.status(404).json({ error: "Playlist not found" });
+      }
 
-    // Fetch the videos for this playlist by joining playlist_videos and videos
-    const videosResult = await pool.query(
-      `
+      // Fetch the videos for this playlist by joining playlist_videos and videos
+      const videosResult = await pool.query(
+        `
       SELECT v.*
       FROM playlist_videos pv
       JOIN videos v ON pv.video_id = v.id
       WHERE pv.playlist_id = $1
       ORDER BY v.id DESC
     `,
-      [playlistId]
-    );
+        [playlistId]
+      );
 
-    return res.json(videosResult.rows);
-  } catch (error) {
-    console.error("Error fetching playlist videos:", error);
-    return res.status(500).json({ error: "Failed to fetch playlist videos" });
+      return res.json(videosResult.rows);
+    } catch (error) {
+      console.error("Error fetching playlist videos:", error);
+      return res.status(500).json({ error: "Failed to fetch playlist videos" });
+    }
   }
-});
+);
 
 /* ============================================================
    7. (Placeholder) Video Upload Endpoint using Supabase Storage

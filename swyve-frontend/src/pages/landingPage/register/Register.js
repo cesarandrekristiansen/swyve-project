@@ -16,6 +16,7 @@ function Register() {
     try {
       const response = await fetch(`${backendUrl}/register`, {
         method: "POST",
+        // credentials: 'include',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, username }),
       });

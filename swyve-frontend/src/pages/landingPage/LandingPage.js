@@ -1,56 +1,62 @@
 // LandingPage.js
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './LandingPage.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./LandingPage.css";
 
 function LandingPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      // If already logged in, redirect to /splash
+      navigate("/splash");
+    }
+  }, [navigate]);
+
   const handleGuest = () => {
-    localStorage.setItem('guest', 'true');
-    localStorage.removeItem('token'); // Ensure no token is present
+    localStorage.setItem("guest", "true");
+    localStorage.removeItem("userId"); // Ensure no token is present
     // Navigate to the home feed
-    navigate('/feed');
+    navigate("/feed");
   };
 
   // Use backend URL from environment variable, fallback to localhost if not set.
-  const backendUrl = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
+  const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
   const handleLogin = async () => {
     try {
       const response = await fetch(`${backendUrl}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        setMessage('Login successful!');
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userId', data.userId);
-        localStorage.removeItem('guest');
-        navigate('/feed'); // Navigate to home or feed after login
+        setMessage("Login successful!");
+
+        // The server sets the HTTP-only cookie. We *do not* store the token.
+        // If you want to track userId in local storage, do so:
+        localStorage.setItem("userId", data.userId);
+        // remove guest if it exists
+        localStorage.removeItem("guest");
+
+        // Now navigate to feed or splash
+        navigate("/feed");
       } else {
-        setMessage(data.error || 'Login failed.');
+        setMessage(data.error || "Login failed.");
       }
     } catch (error) {
-      setMessage('Error logging in.');
+      setMessage("Error logging in.");
     }
   };
 
-  const goToRegister = () => navigate('/register');
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      // If already logged in, redirect to /splash
-      navigate('/splash');
-    }
-  }, [navigate]);
+  const goToRegister = () => navigate("/register");
 
   return (
     <div className="landing-container">
@@ -59,7 +65,11 @@ function LandingPage() {
         <div className="brand-section">
           {/* Replace with your own logo path if needed */}
           <div className="logo-title-row">
-            <img src="/images/logo.png" alt="Swyve Logo" className="splash-logo" />
+            <img
+              src="/images/logo.png"
+              alt="Swyve Logo"
+              className="splash-logo"
+            />
             <h1>SWYVE</h1>
           </div>
           <h2>Sign up to support your favorite Pornstar</h2>
@@ -94,9 +104,10 @@ function LandingPage() {
           {message && <p className="login-message">{message}</p>}
 
           <p className="terms-text">
-            By logging in and using Swyve, you agree to our{' '}
-            <a href="/terms">Terms of Service</a> and{' '}
-            <a href="/privacy">Privacy Policy</a>, and confirm you are at least 18 years old.
+            By logging in and using Swyve, you agree to our{" "}
+            <a href="/terms">Terms of Service</a> and{" "}
+            <a href="/privacy">Privacy Policy</a>, and confirm you are at least
+            18 years old.
           </p>
 
           <div className="login-links">
@@ -104,7 +115,7 @@ function LandingPage() {
             <span onClick={handleGuest} className="register-link">
               Continue as Guest
             </span>
-            {' | '}
+            {" | "}
             <span onClick={goToRegister} className="register-link">
               Sign up for Swyve
             </span>
