@@ -59,6 +59,7 @@ exports.login = async (req, res) => {
       .status(200)
       .json({ username: user.username, userId: user.id });
   } catch (error) {
+    console.error("Error in login route:", error);
     res.status(500).send({ error: "Error logging in" });
   }
 };
