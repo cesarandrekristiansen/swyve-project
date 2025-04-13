@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     try {
       console.log("🔍 Checking auth...");
-      const res = await fetch("http://localhost:5000/api/me", {
+      const res = await fetch(`${url}/api/me`, {
         credentials: "include",
       });
       if (res.status === 401) {

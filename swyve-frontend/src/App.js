@@ -23,7 +23,6 @@ import { useAuth } from "./auth/AuthContext";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [infiniteScroll, setInfiniteScroll] = useState(false);
   const { user } = useAuth();
   const guest = localStorage.getItem("guest");
   const navigate = useNavigate();
@@ -41,10 +40,7 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<Register />} />
-          <Route
-            path="/feed"
-            element={<Feed infiniteScroll={infiniteScroll} />}
-          />
+          <Route path="/feed" element={<Feed />} />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
