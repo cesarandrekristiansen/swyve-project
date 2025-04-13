@@ -8,14 +8,14 @@ const {
 } = require("../controllers/videoController");
 
 const router = express.Router();
-const uploadVideo = require("../middleware/multerVideoConfig");
+const uploadVideoMulter = require("../middleware/multerVideoConfig");
 const { body, param } = require("express-validator");
 
 // Upload video
 router.post(
   "/api/upload-video",
   authMiddleware,
-  uploadVideo.single("video"),
+  uploadVideoMulter.single("video"),
   uploadVideo
 );
 

@@ -5,6 +5,7 @@ const {
   getPlaylists,
   getPlaylistVideos,
   saveToLiked,
+  getLikedVideos,
 } = require("../controllers/playlistController");
 
 const { body, param } = require("express-validator");
