@@ -6,7 +6,6 @@ function Profile() {
   // 1) Read userId from the URL, e.g. /profile/4 => profileId = "4"
   const { profileId } = useParams();
 
-  const [streak, setStreak] = useState(0);
   const [playlists, setPlaylists] = useState([]);
   const [userVideos, setUserVideos] = useState([]);
   const [error, setError] = useState(null);
@@ -15,20 +14,6 @@ function Profile() {
   const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
   // State to store the favorited videos
   const [favoritesVideos, setFavoritesVideos] = useState([]);
-
-  // 2) Fetch streak for this user (if needed)
-  useEffect(() => {
-    if (!profileId) return; // If no user ID, do nothing
-    fetch(`${BASE_URL}/streak`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: profileId }),
-    })
-      .then((res) => res.json())
-      .then((data) => setStreak(data.streakCount || 0))
-      .catch((error) => console.error("Error fetching streak:", error));
-  }, [BASE_URL, profileId]);
 
   // 3) Fetch playlists for this user (if you want)
   useEffect(() => {
@@ -154,11 +139,6 @@ function Profile() {
           </div>
         </div>
         <button className="follow-btn">Follow</button>
-      </div>
-
-      {/* Streak */}
-      <div className="streak-section">
-        <p>🔥 Streak: {streak} days</p>
       </div>
 
       {/* Playlists */}

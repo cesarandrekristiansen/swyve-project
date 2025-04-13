@@ -1,13 +1,6 @@
 // App.js
 import React, { useState } from "react";
-import {
-  Routes,
-  Route,
-  NavLink,
-  useLocation,
-  Navigate,
-  useNavigate,
-} from "react-router-dom";
+import { Routes, Route, NavLink, useNavigate } from "react-router-dom";
 import "./App.css";
 import SplashScreen from "./components/splashscreen/SplashScreen";
 import Feed from "./pages/feed/Feed";
@@ -26,13 +19,12 @@ import {
   FaUser,
   FaSearch,
 } from "react-icons/fa";
+import { useAuth } from "./auth/AuthContext";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [infiniteScroll, setInfiniteScroll] = useState(false);
-  const location = useLocation();
-  const userId = localStorage.getItem("userId");
-  const token = localStorage.getItem("token");
+  const { user } = useAuth();
   const guest = localStorage.getItem("guest");
   const navigate = useNavigate();
 
@@ -70,7 +62,7 @@ function App() {
       </div>
 
       {/* Bottom navigation – show only for logged-in users */}
-      {(token || guest) && (
+      {(user || guest) && (
         <div className="bottom-nav">
           <NavLink to="/feed" className="nav-item">
             <FaHome />
@@ -84,10 +76,7 @@ function App() {
           <NavLink to="/inbox" className="nav-item">
             <FaEnvelope />
           </NavLink>
-          <NavLink
-            to={userId ? `/profile/${userId}` : "/"}
-            className="nav-item"
-          >
+          <NavLink to={user ? `/profile/${user.id}` : "/"} className="nav-item">
             <FaUser />
           </NavLink>
         </div>

@@ -9,11 +9,31 @@ function Upload() {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  const userId = localStorage.getItem("userId");
   const url = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
+  const MAX_FILE_SIZE_MB = 100;
+  const ALLOWED_TYPES = ["video/mp4", "video/webm", "video/ogg"];
+
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    // File size validation
+    if (selectedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setError(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
+      setFile(null);
+      return;
+    }
+
+    // File type validation
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      setError("Invalid file type. Only MP4, WebM, and OGG are allowed.");
+      setFile(null);
+      return;
+    }
+
+    setError("");
+    setFile(selectedFile);
   };
 
   function sanitizeTag(tag) {
@@ -49,7 +69,6 @@ function Upload() {
 
     setUploading(true);
     try {
-      // 1) Upload the file
       const formData = new FormData();
       formData.append("video", file);
 
@@ -69,7 +88,6 @@ function Upload() {
         throw new Error("No videoUrl returned from upload endpoint");
       }
 
-      // 2) Save the metadata
       const tagString = tags.join(",");
       const metadataRes = await fetch(`${url}/api/videos`, {
         method: "POST",
@@ -82,7 +100,6 @@ function Upload() {
           duration: "",
           tags: tagString,
           embed_code: "",
-          userId,
         }),
       });
       const metadataData = await metadataRes.json();
@@ -93,7 +110,6 @@ function Upload() {
 
       alert("Video uploaded and metadata saved successfully!");
 
-      // 3) Reset form
       setFile(null);
       setTitle("");
       setTags([]);
@@ -111,10 +127,8 @@ function Upload() {
       <h2 className="upload-title">Upload Your Video</h2>
 
       <div className="upload-form">
-        {/* Error display */}
         {error && <p className="upload-error">{error}</p>}
 
-        {/* File input */}
         <div className="file-input-container">
           <input
             id="real-file-input"
@@ -127,7 +141,6 @@ function Upload() {
           </label>
         </div>
 
-        {/* Title input */}
         <input
           type="text"
           placeholder="Enter video title"
@@ -136,7 +149,6 @@ function Upload() {
           className="upload-input"
         />
 
-        {/* Tag input + Add button */}
         <div className="tag-input-row">
           <input
             type="text"
@@ -150,7 +162,6 @@ function Upload() {
           </button>
         </div>
 
-        {/* Display the list of tags */}
         <div className="tag-list">
           {tags.map((tag) => (
             <div key={tag} className="tag-item">
@@ -165,7 +176,6 @@ function Upload() {
           ))}
         </div>
 
-        {/* Final upload button */}
         <button
           onClick={handleUpload}
           disabled={uploading}

@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
+import { useAuth } from "../../auth/AuthContext";
 
 function LandingPage() {
+  const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -39,7 +41,7 @@ function LandingPage() {
       const data = await response.json();
       if (response.ok) {
         setMessage("Login successful!");
-
+        setUser({ id: data.userId, email: data.email || "" });
         // The server sets the HTTP-only cookie. We *do not* store the token.
         // If you want to track userId in local storage, do so:
         localStorage.setItem("userId", data.userId);

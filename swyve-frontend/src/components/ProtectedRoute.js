@@ -1,9 +1,13 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
 const ProtectedRoute = () => {
-  const userId = localStorage.getItem("userId");
-  return userId ? <Outlet /> : <Navigate to="/" />;
+  const { user, loading } = useAuth();
+
+  if (loading) return <p>Loading...</p>;
+
+  return user ? <Outlet /> : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;

@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { FaHeart, FaComment, FaBookmark } from "react-icons/fa";
 import "./VideoCard.css";
+import { useAuth } from "../../auth/AuthContext";
 
 function VideoCard({
   videoId,
@@ -16,9 +17,9 @@ function VideoCard({
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
   const [likes, setLikes] = useState(initialLikes || 0);
+  const { user } = useAuth();
 
   useEffect(() => {
-    // If source !== 'library', play/pause the <video> using the intersection observer
     if (source !== "library" && videoRef.current) {
       if (inView) {
         videoRef.current.play();
@@ -29,8 +30,7 @@ function VideoCard({
   }, [inView, source]);
 
   const handleLike = () => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    if (!user) {
       alert("Please log in to like.");
       return;
     }
@@ -38,18 +38,15 @@ function VideoCard({
   };
 
   const handleComment = () => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    if (!user) {
       alert("Please log in to comment.");
       return;
     }
     alert("Comment functionality not implemented.");
   };
 
-  // NEW: Save to Favorites
   const handleSaveToFavorites = async () => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
+    if (!user) {
       alert("Please log in to save favorites.");
       return;
     }
@@ -60,7 +57,7 @@ function VideoCard({
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, videoId }),
+        body: JSON.stringify({ videoId }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -76,7 +73,6 @@ function VideoCard({
   return (
     <div ref={ref} className="video-card">
       {source === "library" ? (
-        // Render an iframe or placeholder if it's a library video
         <div>Library video code here</div>
       ) : (
         <video

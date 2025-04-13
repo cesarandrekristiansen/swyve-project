@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import './SplashScreen.css';
+import React, { useEffect } from "react";
+import "./SplashScreen.css";
 
 function SplashScreen({ onFinish }) {
   /*useEffect(() => {
