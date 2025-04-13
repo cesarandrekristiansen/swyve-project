@@ -21,10 +21,14 @@ app.use(corsMiddleware);
 
 // ========== ROUTES ==========
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const followRoutes = require("./routes/followRoutes");
 const videoRoutes = require("./routes/videoRoutes");
 const playlistRoutes = require("./routes/playlistRoutes");
 
 app.use(authRoutes);
+app.use(userRoutes);
+app.use(followRoutes);
 app.use(videoRoutes);
 app.use(playlistRoutes);
 

@@ -4,7 +4,7 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 const allowedMimeTypes = ["video/mp4", "video/webm", "video/ogg"];
 
-const upload = multer({
+const uploadVideo = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (req, file, cb) => {
@@ -16,4 +16,4 @@ const upload = multer({
   },
 });
 
-module.exports = upload;
+module.exports = uploadVideo;

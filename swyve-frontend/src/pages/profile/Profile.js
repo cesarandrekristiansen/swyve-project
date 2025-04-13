@@ -26,17 +26,6 @@ function Profile() {
       .catch((error) => console.error("Error fetching playlists:", error));
   }, [BASE_URL, profileId]);
 
-  // In Profile.js
-  useEffect(() => {
-    if (!profileId) return;
-    fetch(`${BASE_URL}/api/playlists?userId=${profileId}`, {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setPlaylists(data))
-      .catch((error) => console.error("Error fetching playlists:", error));
-  }, [BASE_URL, profileId]);
-
   // 4) Fetch only this user’s videos from the new endpoint
   useEffect(() => {
     if (!profileId) return;

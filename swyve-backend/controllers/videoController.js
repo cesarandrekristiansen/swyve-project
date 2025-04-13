@@ -62,10 +62,16 @@ exports.saveMetadata = async (req, res) => {
 };
 
 exports.getAllVideos = async (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+
   try {
-    const result = await pool.query("SELECT * FROM videos ORDER BY RANDOM()");
+    const result = await pool.query(
+      `SELECT * FROM videos ORDER BY RANDOM() LIMIT $1`,
+      [limit]
+    );
     return res.json(result.rows);
   } catch (err) {
+    console.error("Error in getAllVideos:", err);
     return res.status(500).json({ error: err.message });
   }
 };

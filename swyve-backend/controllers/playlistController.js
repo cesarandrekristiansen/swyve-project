@@ -1,20 +1,51 @@
 const { validationResult } = require("express-validator");
 const pool = require("../db/pool");
 
-async function getOrCreateFavoritesPlaylist(userId) {
+async function getOrCreateLikedPlaylist(userId) {
   const checkResult = await pool.query(
     "SELECT id FROM playlists WHERE user_id = $1 AND name = $2 LIMIT 1",
-    [userId, "Favorites"]
+    [userId, "Liked"]
   );
   if (checkResult.rows.length > 0) {
     return checkResult.rows[0].id;
   }
   const insertResult = await pool.query(
-    "INSERT INTO playlists (user_id, name) VALUES ($1, $2) RETURNING id",
-    [userId, "Favorites"]
+    "INSERT INTO playlists (user_id, name) VALUES ($1, 'Liked') RETURNING id",
+    [userId]
   );
   return insertResult.rows[0].id;
 }
+
+exports.getLikedVideos = async (req, res) => {
+  const { userId } = req.params;
+
+  // find or create Liked playlist for that user
+  // or if you want to display another user’s liked, handle that
+  try {
+    const likedResult = await pool.query(
+      "SELECT id FROM playlists WHERE user_id = $1 AND name = 'Liked' LIMIT 1",
+      [userId]
+    );
+    if (likedResult.rows.length === 0) {
+      return res.json([]); // no 'Liked' playlist => return empty
+    }
+    const likedId = likedResult.rows[0].id;
+
+    // fetch videos from that playlist
+    const videosResult = await pool.query(
+      `SELECT v.*
+       FROM playlist_videos pv
+       JOIN videos v ON pv.video_id = v.id
+       WHERE pv.playlist_id = $1
+       ORDER BY v.id DESC`,
+      [likedId]
+    );
+    return res.json(videosResult.rows);
+  } catch (error) {
+    console.error("Error fetching liked videos:", error);
+    return res.status(500).json({ error: "Failed to fetch liked videos" });
+  }
+};
 
 exports.createPlaylist = async (req, res) => {
   const errors = validationResult(req);
@@ -79,7 +110,7 @@ exports.getPlaylistVideos = async (req, res) => {
   }
 };
 
-exports.saveToFavorites = async (req, res) => {
+exports.saveToLiked = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -91,18 +122,18 @@ exports.saveToFavorites = async (req, res) => {
   }
 
   try {
-    const favoritesId = await getOrCreateFavoritesPlaylist(userId);
+    const likedId = await getOrCreateLikedPlaylist(userId);
 
     await pool.query(
       `INSERT INTO playlist_videos (playlist_id, video_id)
        VALUES ($1, $2)
        ON CONFLICT DO NOTHING`,
-      [favoritesId, videoId]
+      [likedId, videoId]
     );
 
-    return res.status(200).json({ message: "Video saved to favorites!" });
+    return res.status(200).json({ message: "Video saved to liked!" });
   } catch (error) {
-    console.error("Error saving favorite:", error);
-    return res.status(500).json({ error: "Failed to save video to favorites" });
+    console.error("Error saving liked:", error);
+    return res.status(500).json({ error: "Failed to save video to liked" });
   }
 };

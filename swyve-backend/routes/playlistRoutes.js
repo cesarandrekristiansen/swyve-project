@@ -4,7 +4,7 @@ const {
   createPlaylist,
   getPlaylists,
   getPlaylistVideos,
-  saveToFavorites,
+  saveToLiked,
 } = require("../controllers/playlistController");
 
 const { body, param } = require("express-validator");
@@ -23,18 +23,28 @@ router.post(
   ],
   createPlaylist
 );
+
 router.get("/api/playlists", authMiddleware, getPlaylists);
+
 router.get(
   "/api/playlists/:playlistId/videos",
   authMiddleware,
   [param("playlistId").isInt().withMessage("Playlist ID must be an integer")],
   getPlaylistVideos
 );
+
 router.post(
-  "/api/favorites",
+  "/api/liked",
   authMiddleware,
   [body("videoId").isInt().withMessage("videoId must be an integer")],
-  saveToFavorites
+  saveToLiked
+);
+
+router.get(
+  "/api/users/:userId/liked",
+  authMiddleware,
+  [param("userId").isInt()],
+  getLikedVideos
 );
 
 module.exports = router;
