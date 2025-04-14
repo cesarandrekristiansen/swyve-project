@@ -5,24 +5,21 @@ import "./LandingPage.css";
 import { useAuth } from "../../auth/AuthContext";
 
 function LandingPage() {
-  const { setUser } = useAuth();
+  const { user, setUser, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
-    if (userId) {
+    if (!loading && user) {
       // If already logged in, redirect to /splash
       navigate("/splash");
     }
-  }, [navigate]);
+  }, [loading, user, navigate]);
 
   const handleGuest = () => {
     localStorage.setItem("guest", "true");
-    localStorage.removeItem("userId"); // Ensure no token is present
-    // Navigate to the home feed
     navigate("/feed");
   };
 
@@ -42,10 +39,7 @@ function LandingPage() {
       if (response.ok) {
         setMessage("Login successful!");
         setUser({ id: data.userId, email: data.email || "" });
-        // The server sets the HTTP-only cookie. We *do not* store the token.
-        // If you want to track userId in local storage, do so:
-        localStorage.setItem("userId", data.userId);
-        // remove guest if it exists
+
         localStorage.removeItem("guest");
 
         // Now navigate to feed or splash
@@ -62,10 +56,8 @@ function LandingPage() {
 
   return (
     <div className="landing-container">
-      {/* Left column with branding/marketing message */}
       <div className="landing-left">
         <div className="brand-section">
-          {/* Replace with your own logo path if needed */}
           <div className="logo-title-row">
             <img
               src="/images/logo.png"
@@ -78,7 +70,6 @@ function LandingPage() {
         </div>
       </div>
 
-      {/* Right column with the login form */}
       <div className="landing-right">
         <div className="login-form">
           <h2>Log in</h2>

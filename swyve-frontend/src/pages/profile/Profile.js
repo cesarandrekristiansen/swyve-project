@@ -247,8 +247,6 @@ function Profile() {
       method: "POST",
       credentials: "include",
     });
-    // clear localStorage items
-    localStorage.removeItem("userId");
     // navigate to login
     navigate("/");
   };

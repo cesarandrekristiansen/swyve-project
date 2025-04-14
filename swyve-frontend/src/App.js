@@ -9,7 +9,7 @@ import Upload from "./pages/upload/Upload";
 import Inbox from "./pages/inbox/Inbox";
 import Register from "./pages/landingPage/register/Register";
 import LandingPage from "./pages/landingPage/LandingPage";
-import Trending from "./pages/trending/Trending";
+import Search from "./pages/search/Search";
 import Stats from "./Stats";
 import ProtectedRoute from "./components/ProtectedRoute";
 import {
@@ -51,7 +51,7 @@ function App() {
             <Route path="/upload" element={<Upload />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile/:profileId" element={<Profile />} />
-            <Route path="/trending" element={<Trending />} />
+            <Route path="/trending" element={<Search />} />
             <Route path="/stats" element={<Stats />} />
           </Route>
         </Routes>
