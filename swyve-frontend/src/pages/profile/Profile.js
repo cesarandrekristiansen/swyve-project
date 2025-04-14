@@ -265,7 +265,10 @@ function Profile() {
           <>
             <img
               className="profile-pic"
-              src={profileData.profile_pic_url || "/images/profile-Pic.png"}
+              src={
+                profileData.profile_pic_url ||
+                "../../../public/images/profile-Pic.png"
+              }
               alt="Profile"
               onClick={() =>
                 isMyProfile && document.getElementById("picInput").click()
