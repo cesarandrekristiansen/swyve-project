@@ -19,27 +19,24 @@ async function getOrCreateLikedPlaylist(userId) {
 exports.getLikedVideos = async (req, res) => {
   const { userId } = req.params;
 
-  // find or create Liked playlist for that user
-  // or if you want to display another user’s liked, handle that
   try {
-    const likedResult = await pool.query(
-      "SELECT id FROM playlists WHERE user_id = $1 AND name = 'Liked' LIMIT 1",
+    const videosResult = await pool.query(
+      `
+      SELECT 
+        v.*, 
+        u.username, 
+        u.profile_pic_url,
+        COUNT(vl2.id) AS likes_count
+      FROM video_likes vl
+      JOIN videos v ON vl.video_id = v.id
+      JOIN users u ON v.user_id = u.id
+      LEFT JOIN video_likes vl2 ON vl2.video_id = v.id
+      WHERE vl.user_id = $1
+      GROUP BY v.id, u.id
+      `,
       [userId]
     );
-    if (likedResult.rows.length === 0) {
-      return res.json([]); // no 'Liked' playlist => return empty
-    }
-    const likedId = likedResult.rows[0].id;
 
-    // fetch videos from that playlist
-    const videosResult = await pool.query(
-      `SELECT v.*
-       FROM playlist_videos pv
-       JOIN videos v ON pv.video_id = v.id
-       WHERE pv.playlist_id = $1
-       ORDER BY v.id DESC`,
-      [likedId]
-    );
     return res.json(videosResult.rows);
   } catch (error) {
     console.error("Error fetching liked videos:", error);

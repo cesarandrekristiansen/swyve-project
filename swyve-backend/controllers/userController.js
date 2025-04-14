@@ -31,8 +31,16 @@ exports.getUserProfile = async (req, res) => {
     );
     const followingCount = parseInt(followingResult.rows[0].count, 10);
 
-    // For now, let's do a placeholder:
-    let totalLikes = 0; // or compute if you have a 'video_likes' table
+    const totalLikesResult = await pool.query(
+      `
+      SELECT COUNT(vl.id) AS total
+      FROM videos v
+      LEFT JOIN video_likes vl ON vl.video_id = v.id
+      WHERE v.user_id = $1
+      `,
+      [userId]
+    );
+    const totalLikesCount = parseInt(totalLikesResult.rows[0].total, 10);
 
     // Return the combined info
     return res.json({
@@ -42,7 +50,7 @@ exports.getUserProfile = async (req, res) => {
       profile_pic_url: userRow.profile_pic_url,
       followers: followersCount,
       following: followingCount,
-      totalLikes,
+      totalLikesCount,
     });
   } catch (error) {
     console.error("Error in getUserProfile:", error);
