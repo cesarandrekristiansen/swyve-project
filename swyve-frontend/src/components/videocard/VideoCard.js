@@ -96,7 +96,7 @@ function VideoCard({ video }) {
         <button onClick={handleProfileClick}>
           <img
             className="img-styling"
-            src={profile_pic_url || "/images/profile-Pic.png"}
+            src={profile_pic_url || "/images/profile-pic.png"}
             alt={username}
           />
         </button>
