@@ -37,7 +37,14 @@ exports.getLikedVideos = async (req, res) => {
       [userId]
     );
 
-    return res.json(videosResult.rows);
+    // Enrich each video with isliked and parsed likes_count
+    const enriched = videosResult.rows.map((vid) => ({
+      ...vid,
+      isliked: true,
+      likes_count: parseInt(vid.likes_count, 10),
+    }));
+
+    return res.json(enriched);
   } catch (error) {
     console.error("Error fetching liked videos:", error);
     return res.status(500).json({ error: "Failed to fetch liked videos" });

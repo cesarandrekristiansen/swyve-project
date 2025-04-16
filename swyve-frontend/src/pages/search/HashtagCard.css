@@ -1,0 +1,33 @@
+.hashtag-card {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  border-radius: 14px;
+  color: white;
+  cursor: pointer;
+  margin: 10px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.hashtag-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.hashtag-icon {
+  font-size: 28px;
+  margin-right: 12px;
+  color: #aaa;
+}
+
+.hashtag-details strong {
+  font-size: 16px;
+  color: white;
+}
+
+.hashtag-details p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #bbb;
+}

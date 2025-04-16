@@ -122,13 +122,13 @@ exports.getAllVideos = async (req, res) => {
 };
 
 exports.getUserVideos = async (req, res) => {
-  // Check validation
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
   const { userId } = req.params;
-  console.log("Fetching videos for user:", userId);
+  const viewerId = req.userId;
 
   try {
     const userCheck = await pool.query("SELECT id FROM users WHERE id = $1", [
@@ -139,12 +139,47 @@ exports.getUserVideos = async (req, res) => {
     }
 
     const videosResult = await pool.query(
-      "SELECT * FROM videos WHERE user_id = $1 ORDER BY id DESC",
+      `
+      SELECT 
+        v.*, 
+        u.username, 
+        u.profile_pic_url,
+        COUNT(vl.id) AS likes_count
+      FROM videos v
+      JOIN users u ON v.user_id = u.id
+      LEFT JOIN video_likes vl ON vl.video_id = v.id
+      WHERE v.user_id = $1
+      GROUP BY v.id, u.id
+      ORDER BY v.id DESC
+      `,
       [userId]
     );
 
-    return res.json(videosResult.rows);
+    let videos = videosResult.rows;
+
+    // add isliked
+    if (viewerId) {
+      const liked = await pool.query(
+        `SELECT video_id FROM video_likes WHERE user_id = $1`,
+        [viewerId]
+      );
+      const likedIds = new Set(liked.rows.map((r) => r.video_id));
+      videos = videos.map((vid) => ({
+        ...vid,
+        isliked: likedIds.has(vid.id),
+        likes_count: parseInt(vid.likes_count, 10),
+      }));
+    } else {
+      videos = videos.map((vid) => ({
+        ...vid,
+        isliked: false,
+        likes_count: parseInt(vid.likes_count, 10),
+      }));
+    }
+
+    res.json(videos);
   } catch (err) {
+    console.error("Error fetching user videos:", err);
     return res.status(500).json({ error: err.message });
   }
 };

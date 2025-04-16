@@ -6,7 +6,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./VideoCard.css";
 
-function VideoCard({ video }) {
+function VideoCard({ video, onProfileClick }) {
   const {
     id,
     url,
@@ -14,7 +14,6 @@ function VideoCard({ video }) {
     profile_pic_url,
     isliked,
     likes_count,
-    // any other fields like title, user_id
     user_id,
     title,
   } = video;
@@ -22,7 +21,7 @@ function VideoCard({ video }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(isliked);
-  const [likes, setLikes] = useState(likes_count || 0);
+  const [likes, setLikes] = useState(parseInt(likes_count, 10) || 0);
 
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
@@ -36,6 +35,7 @@ function VideoCard({ video }) {
   }, [inView]);
 
   function handleProfileClick() {
+    if (onProfileClick) onProfileClick();
     navigate(`/profile/${user_id}`);
   }
 

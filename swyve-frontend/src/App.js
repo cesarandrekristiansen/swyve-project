@@ -12,6 +12,7 @@ import LandingPage from "./pages/landingPage/LandingPage";
 import Search from "./pages/search/Search";
 import Stats from "./Stats";
 import ProtectedRoute from "./components/ProtectedRoute";
+import HashtagPage from "./pages/search/HashtagPage";
 import {
   FaHome,
   FaPlusCircle,
@@ -52,6 +53,7 @@ function App() {
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/profile/:profileId" element={<Profile />} />
             <Route path="/trending" element={<Search />} />
+            <Route path="/hashtag/:tag" element={<HashtagPage />} />
             <Route path="/stats" element={<Stats />} />
           </Route>
         </Routes>

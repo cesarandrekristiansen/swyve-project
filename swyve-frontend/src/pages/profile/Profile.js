@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./Profile.css";
 import { useAuth } from "../../../src/auth/AuthContext";
+import { FaVideo, FaHeart } from "react-icons/fa";
+import ProfileFeedModal from "./ProfileFeedModal";
 
 function Profile() {
   const navigate = useNavigate();
@@ -17,6 +19,8 @@ function Profile() {
   const [error, setError] = useState(null);
   const [likedVideos, setLikedVideos] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [startIndex, setStartIndex] = useState(0);
 
   const [editingUsername, setEditingUsername] = useState(false);
   const [tempUsername, setTempUsername] = useState("");
@@ -256,131 +260,167 @@ function Profile() {
     console.log("Edit profile clicked.");
   };
 
+  const enrichedVideos =
+    activeTab === "liked" && isMyProfile
+      ? likedVideos
+      : userVideos.map((video) => ({
+          ...video,
+          username: video.username || "",
+          profile_pic_url: video.profile_pic_url || null,
+          user_id: video.user_id || null,
+          isliked: video.isliked ?? false,
+          likes_count: video.likes_count || 0,
+        }));
+
   return (
     <div className="profile-page">
-      <div className="profile-header">
-        {profileData && (
-          <>
-            <img
-              className="profile-pic"
-              src={profileData.profile_pic_url || "/images/profile-pic.png"}
-              alt="Profile"
-              onClick={() =>
-                isMyProfile && document.getElementById("picInput").click()
-              }
-              style={{ cursor: isMyProfile ? "pointer" : "default" }}
-            />
+      {profileData && (
+        <>
+          {editingUsername ? (
             <input
-              id="picInput"
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={handleProfilePicChange}
+              type="text"
+              className="username-edit"
+              value={tempUsername}
+              onChange={(e) => setTempUsername(e.target.value)}
+              onBlur={saveUsername}
+              onKeyDown={(e) => e.key === "Enter" && saveUsername()}
             />
-            {editingUsername ? (
-              <input
-                type="text"
-                value={tempUsername}
-                onChange={(e) => setTempUsername(e.target.value)}
-                onBlur={saveUsername}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") saveUsername();
-                }}
-              />
-            ) : (
-              <h2
-                className="username"
-                onClick={() => isMyProfile && setEditingUsername(true)}
-              >
-                @{profileData.username}
-              </h2>
-            )}
-            {editingBio ? (
+          ) : (
+            <h2
+              className="top-username"
+              onClick={() => isMyProfile && setEditingUsername(true)}
+            >
+              {profileData.username}
+            </h2>
+          )}
+
+          <img
+            className="profile-pic"
+            src={profileData.profile_pic_url || "/images/profile-pic.png"}
+            alt="Profile"
+            onClick={() =>
+              isMyProfile && document.getElementById("picInput").click()
+            }
+            style={{ cursor: isMyProfile ? "pointer" : "default" }}
+          />
+          <input
+            id="picInput"
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleProfilePicChange}
+          />
+
+          {editingUsername ? (
+            <input
+              type="text"
+              className="username-edit"
+              value={tempUsername}
+              onChange={(e) => setTempUsername(e.target.value)}
+              onBlur={saveUsername}
+              onKeyDown={(e) => e.key === "Enter" && saveUsername()}
+            />
+          ) : (
+            <p
+              className="handle"
+              onClick={() => isMyProfile && setEditingUsername(true)}
+            >
+              @{profileData.username}
+            </p>
+          )}
+
+          <div className="profile-stats">
+            <div>
+              <strong>{profileData.following}</strong>
+              <span>Following</span>
+            </div>
+            <div>
+              <strong>{profileData.followers}</strong>
+              <span>Followers</span>
+            </div>
+            <div>
+              <strong>{profileData.totalLikesCount}</strong>
+              <span>Likes</span>
+            </div>
+          </div>
+
+          {!isMyProfile ? (
+            <div className="profile-actions">
+              <button className="follow-btn" onClick={handleFollowClick}>
+                {isFollowing ? "Unfollow" : "Follow"}
+              </button>
+              <button className="message-btn">Message</button>
+            </div>
+          ) : null}
+
+          {isMyProfile ? (
+            editingBio ? (
               <textarea
+                className="bio-edit"
                 value={tempBio}
                 onChange={(e) => setTempBio(e.target.value)}
                 onBlur={saveBio}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") saveBio();
-                }}
+                placeholder="Write something..."
               />
             ) : (
-              <p
-                className="bio"
-                onClick={() => isMyProfile && setEditingBio(true)}
-              >
-                {isMyProfile
-                  ? profileData.bio || "Click to add a bio..."
-                  : profileData.bio}
+              <p className="bio" onClick={() => setEditingBio(true)}>
+                {profileData.bio || "Click to add a bio..."}
               </p>
-            )}
-            <div className="profile-stats">
-              <div>
-                <strong>{profileData.followers}</strong>
-                <p>Followers</p>
-              </div>
-              <div>
-                <strong>{profileData.following}</strong>
-                <p>Following</p>
-              </div>
-              <div>
-                <strong>{profileData.totalLikesCount}</strong>
-                <p>Likes</p>
-              </div>
+            )
+          ) : (
+            <p className="bio">{profileData.bio}</p>
+          )}
+
+          {isMyProfile && (
+            <div className="profile-tabs">
+              <button
+                className={activeTab === "uploaded" ? "active" : ""}
+                onClick={() => setActiveTab("uploaded")}
+              >
+                <FaVideo />
+              </button>
+              <button
+                className={activeTab === "liked" ? "active" : ""}
+                onClick={() => setActiveTab("liked")}
+              >
+                <FaHeart />
+              </button>
             </div>
-          </>
-        )}
-      </div>
-      {!isMyProfile && (
-        <button onClick={handleFollowClick} className="follow-btn">
-          {isFollowing ? "Unfollow" : "Follow"}
-        </button>
-      )}
-      <div className="tabs">
-        <button
-          className={activeTab === "uploaded" ? "active" : ""}
-          onClick={() => setActiveTab("uploaded")}
-        >
-          Uploaded
-        </button>
-        {isMyProfile && (
-          <button
-            className={activeTab === "liked" ? "active" : ""}
-            onClick={() => setActiveTab("liked")}
-          >
-            Liked
-          </button>
-        )}
-      </div>
-
-      {activeTab === "uploaded" && (
-        <div className="video-gallery">
-          {userVideos.length > 0 ? (
-            userVideos.map((video) => (
-              <div key={video.id} className="video-card">
-                <img src={video.thumbnail_url} alt={video.title} />
-                <p>{video.title}</p>
-              </div>
-            ))
-          ) : (
-            <p>No uploaded videos yet.</p>
           )}
-        </div>
+
+          <div className="video-gallery">
+            {(activeTab === "liked" && isMyProfile
+              ? likedVideos
+              : userVideos
+            ).map((video, index) => (
+              <div
+                className="video-thumb"
+                key={video.id}
+                onClick={() => {
+                  setStartIndex(index);
+                  setModalOpen(true);
+                }}
+              >
+                <video
+                  src={video.url}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  className="profile-video"
+                />
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
-      {activeTab === "liked" && (
-        <div className="video-gallery">
-          {likedVideos.length > 0 ? (
-            likedVideos.map((video) => (
-              <div key={video.id} className="video-card">
-                <img src={video.thumbnail_url} alt={video.title} />
-                <p>{video.title}</p>
-              </div>
-            ))
-          ) : (
-            <p>No liked videos yet.</p>
-          )}
-        </div>
+      {/* MODAL FEED VIEWER */}
+      {modalOpen && (
+        <ProfileFeedModal
+          videos={enrichedVideos}
+          startIndex={startIndex}
+          onClose={() => setModalOpen(false)}
+        />
       )}
     </div>
   );

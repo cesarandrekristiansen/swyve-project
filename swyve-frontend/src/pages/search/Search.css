@@ -1,23 +1,132 @@
 .search-page {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
 }
 
-.search-bar {
-  margin-bottom: 20px;
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
 }
 
 .search-input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 12px 40px 12px 16px; /* right padding for icon space */
   font-size: 16px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
+  border: none;
+  border-radius: 10px;
   outline: none;
-  transition: border-color 0.2s ease-in-out;
+  box-shadow: 0 0 0 2px transparent;
+  transition: box-shadow 0.2s ease;
 }
 
 .search-input:focus {
-  border-color: #ff5a5f;
+  box-shadow: 0 0 0 2px #ff5a5f; /* subtle focus ring */
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #333;
+  pointer-events: none;
+  font-size: 20px;
+  color: #888;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.filter-button {
+  padding: 6px 12px;
+  border: 1px solid white;
+  border-radius: 20px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.filter-button.active {
+  background: white;
+  color: #111;
+}
+
+.search-hint {
+  text-align: center;
+  margin-top: 30px;
+  color: #ccc;
+  font-weight: 500;
+}
+
+.search-result-card {
+  border-radius: 14px;
+  padding: 12px;
+  margin: 10px 0;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  gap: 14px;
+}
+
+.search-result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.search-result-card.user img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
+.search-result-card.hashtag .hashtag-symbol {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #27272f;
+  color: white;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-result-card .text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 0.3;
+  height: 60px;
+  transform: translateY(1px); /* nudge whole text block down a touch */
+}
+
+.search-result-card .text .username,
+.search-result-card .text .tag-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0px;
+}
+
+.search-result-card .text .type {
+  font-size: 0.9rem;
+  color: #ccc;
 }

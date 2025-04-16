@@ -26,6 +26,7 @@ const followRoutes = require("./routes/followRoutes");
 const videoRoutes = require("./routes/videoRoutes");
 const playlistRoutes = require("./routes/playlistRoutes");
 const likeRoutes = require("./routes/likeRoutes");
+const searchRoutes = require("./routes/searchRoutes");
 
 app.use(authRoutes);
 app.use(userRoutes);
@@ -33,6 +34,7 @@ app.use(followRoutes);
 app.use(videoRoutes);
 app.use(playlistRoutes);
 app.use(likeRoutes);
+app.use(searchRoutes);
 
 // ========== START SERVER ==========
 app.listen(PORT, () => {
