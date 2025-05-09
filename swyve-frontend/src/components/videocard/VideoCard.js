@@ -7,16 +7,8 @@ import { useNavigate } from "react-router-dom";
 import "./VideoCard.css";
 
 function VideoCard({ video, onProfileClick }) {
-  const {
-    id,
-    url,
-    username,
-    profile_pic_url,
-    isliked,
-    likes_count,
-    user_id,
-    title,
-  } = video;
+  const { id, url, username, profile_pic_url, isliked, likes_count, user_id } =
+    video;
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -26,11 +18,10 @@ function VideoCard({ video, onProfileClick }) {
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
 
+  // Auto-play/pause
   useEffect(() => {
-    if (videoRef.current && inView) {
-      videoRef.current.play();
-    } else if (videoRef.current) {
-      videoRef.current.pause();
+    if (videoRef.current) {
+      inView ? videoRef.current.play() : videoRef.current.pause();
     }
   }, [inView]);
 
@@ -44,21 +35,15 @@ function VideoCard({ video, onProfileClick }) {
       alert("Please log in to like/unlike.");
       return;
     }
-    const method = liked ? "DELETE" : "POST";
     try {
       const res = await fetch(
-        `${
-          process.env.REACT_APP_BASE_URL || "http://localhost:5000"
-        }/api/videos/${id}/like`,
+        `${process.env.REACT_APP_BASE_URL}/api/videos/${id}/like`,
         {
-          method,
+          method: liked ? "DELETE" : "POST",
           credentials: "include",
         }
       );
-      if (!res.ok) {
-        throw new Error("Failed to toggle like");
-      }
-      // update local states
+      if (!res.ok) throw new Error("Failed to toggle like");
       setLiked(!liked);
       setLikes((prev) => (liked ? prev - 1 : prev + 1));
     } catch (err) {
@@ -85,28 +70,26 @@ function VideoCard({ video, onProfileClick }) {
         playsInline
         autoPlay
       />
-      <div className="video-overlay">
-        {/* clickable user info */}
-        <p style={{ cursor: "pointer" }} onClick={handleProfileClick}>
-          @{username}
-        </p>
-      </div>
+
       <div className="video-actions">
-        {/* profile pic also clickable */}
-        <button onClick={handleProfileClick}>
+        <button className="video-action-btn" onClick={handleProfileClick}>
           <img
-            className="img-styling"
+            className="video-action-avatar"
             src={profile_pic_url || "/images/profile-pic.png"}
             alt={username}
           />
         </button>
-        {/* like button with dynamic color and count */}
-        <button onClick={toggleLike}>
-          <FaHeart style={{ color: liked ? "red" : "white" }} /> {likes}
+        <button className="video-action-btn" onClick={toggleLike}>
+          <FaHeart className={`video-action-icon${liked ? " liked" : ""}`} />
+          <span className="video-action-count">{likes}</span>
         </button>
-        <button onClick={handleComment}>
-          <FaComment />
+        <button className="video-action-btn" onClick={handleComment}>
+          <FaComment className="video-action-icon" />
         </button>
+      </div>
+
+      <div className="video-overlay" onClick={handleProfileClick}>
+        <span className="video-username">{username}</span>
       </div>
     </div>
   );

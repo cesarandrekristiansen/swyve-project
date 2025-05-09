@@ -1,37 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import VideoCard from "../../components/videocard/VideoCard";
-import "./HashtagFeedModal.css";
+import React from "react";
+import VideoFeed from "../../components/videofeed/VideoFeed";
 
-const HashtagFeedModal = ({ videos, startIndex, onClose }) => {
-  const [currentIndex, setCurrentIndex] = useState(startIndex);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo({
-        top: currentIndex * window.innerHeight,
-        behavior: "instant",
-      });
-    }
-  }, [currentIndex]);
-
+export default function HashtagFeedModal({ videos, startIndex, onClose }) {
   return (
-    <div className="profile-feed-modal">
-      <button className="close-button" onClick={onClose}>
-        ✕
-      </button>
-      <div className="feed-scroll-container" ref={containerRef}>
-        {videos.map((video) => (
-          <div key={video.id} className="feed-slide">
-            <VideoCard
-              video={video}
-              onProfileClick={onClose} // closes modal before navigating
-            />
-          </div>
-        ))}
-      </div>
+    <div className="video-feed-modal-wrapper">
+      <VideoFeed videos={videos} startIndex={startIndex} onClose={onClose} />
     </div>
   );
-};
-
-export default HashtagFeedModal;
+}
