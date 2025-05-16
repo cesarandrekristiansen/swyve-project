@@ -20,8 +20,15 @@ function VideoCard({ video, onProfileClick }) {
 
   // Auto-play/pause
   useEffect(() => {
-    if (videoRef.current) {
-      inView ? videoRef.current.play() : videoRef.current.pause();
+    const vid = videoRef.current;
+    if (!vid) return;
+    if (inView) {
+      vid.muted = true;
+      vid.play().catch((err) => {
+        console.warn("Autoplay prevented, user interaction required", err);
+      });
+    } else {
+      vid.pause();
     }
   }, [inView]);
 
@@ -68,7 +75,7 @@ function VideoCard({ video, onProfileClick }) {
         className="video-player"
         loop
         playsInline
-        autoPlay
+        muted
       />
 
       <div className="video-actions">
