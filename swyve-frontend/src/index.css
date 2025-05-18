@@ -1,3 +1,15 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+}
+
 .inbox-page {
   background: linear-gradient(135deg, #ff4500, #6a0dad);
   color: white;
@@ -52,9 +64,4 @@
 .message-content {
   font-size: 1rem;
   line-height: 1.5;
-}
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
 }
