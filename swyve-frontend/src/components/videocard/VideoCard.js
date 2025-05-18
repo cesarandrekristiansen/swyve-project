@@ -1,7 +1,9 @@
 // src/components/videocard/VideoCard.js
 import React, { useRef, useState, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import { FaHeart, FaComment } from "react-icons/fa";
+import { IoMdHeart, IoIosSave } from "react-icons/io";
+import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
+import { FaShare } from "react-icons/fa";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./VideoCard.css";
@@ -79,17 +81,31 @@ function VideoCard({ video, onProfileClick }) {
             alt={username}
           />
         </button>
-        <button className="video-action-btn" onClick={toggleLike}>
-          <FaHeart className={`video-action-icon${liked ? " liked" : ""}`} />
+        <button className="video-action-btn-with-numbers" onClick={toggleLike}>
+          <IoMdHeart className={`video-action-icon${liked ? " liked" : ""}`} />
           <span className="video-action-count">{likes}</span>
         </button>
-        <button className="video-action-btn" onClick={handleComment}>
-          <FaComment className="video-action-icon" />
+        <button
+          className="video-action-btn-with-numbers"
+          onClick={handleComment}
+        >
+          <IoChatbubbleEllipsesSharp className="video-action-icon" />
+          <span className="video-action-count">0</span>
+        </button>
+        <button className="video-action-btn">
+          <IoIosSave className="video-action-icon" />
+        </button>
+        <button className="video-action-btn">
+          <FaShare className="video-action-icon" />
         </button>
       </div>
 
       <div className="video-overlay" onClick={handleProfileClick}>
         <span className="video-username">{username}</span>
+        <span className="video-description">
+          Hot girl etc description big ass Hot girl etc description big ass Hot
+          girl
+        </span>
       </div>
     </div>
   );
