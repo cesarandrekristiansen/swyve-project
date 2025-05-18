@@ -1,4 +1,3 @@
-// src/components/videocard/VideoCard.js
 import React, { useRef, useState, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { FaHeart, FaComment } from "react-icons/fa";
@@ -23,7 +22,6 @@ function VideoCard({ video, onProfileClick }) {
     const vid = videoRef.current;
     if (!vid) return;
     if (inView) {
-      vid.muted = true;
       vid.play().catch((err) => {
         console.warn("Autoplay prevented, user interaction required", err);
       });
@@ -75,7 +73,8 @@ function VideoCard({ video, onProfileClick }) {
         className="video-player"
         loop
         playsInline
-        muted
+        controls
+        preload="metadata"
       />
 
       <div className="video-actions">

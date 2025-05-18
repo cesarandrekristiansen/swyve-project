@@ -4,6 +4,7 @@ import "./Profile.css";
 import { useAuth } from "../../../src/auth/AuthContext";
 import { FaVideo, FaHeart } from "react-icons/fa";
 import ProfileFeedModal from "./ProfileFeedModal";
+import thumbail from "../../logo.png"
 
 function Profile() {
   const navigate = useNavigate();
@@ -401,8 +402,8 @@ function Profile() {
                   setModalOpen(true);
                 }}
               >
-                <video
-                  src={video.url}
+                <img
+                  src={thumbail}
                   muted
                   playsInline
                   preload="metadata"
