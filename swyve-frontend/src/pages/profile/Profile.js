@@ -403,7 +403,7 @@ function Profile() {
                 }}
               >
                 <img
-                  src={thumbail}
+                  src={thumbail} // middlertidig løsning 
                   muted
                   playsInline
                   preload="metadata"

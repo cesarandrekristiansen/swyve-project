@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./HashtagPage.css";
 import HashtagFeedModal from "./HashtagFeedModal";
-
+import thumbnail from "../../logo.png"
 function HashtagPage() {
   const { tag } = useParams();
   const [videos, setVideos] = useState([]);
@@ -48,8 +48,8 @@ function HashtagPage() {
               setModalOpen(true);
             }}
           >
-            <video
-              src={video.url}
+            <img
+              src={thumbnail} // middlertidig løsning 
               muted
               playsInline
               preload="metadata"
