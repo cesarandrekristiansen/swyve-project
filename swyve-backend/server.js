@@ -9,6 +9,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+
 // ========== MIDDLEWARE ==========
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
@@ -27,7 +28,7 @@ const videoRoutes = require("./routes/videoRoutes");
 const playlistRoutes = require("./routes/playlistRoutes");
 const likeRoutes = require("./routes/likeRoutes");
 const searchRoutes = require("./routes/searchRoutes");
-
+app.use(require("./routes/passwordRoutes"));
 app.use(authRoutes);
 app.use(userRoutes);
 app.use(followRoutes);

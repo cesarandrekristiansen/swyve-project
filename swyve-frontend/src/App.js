@@ -21,6 +21,8 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { useAuth } from "./auth/AuthContext";
+import ForgotPassword from "../src/reset_password/ForgotPassword";
+import ResetPassword from "../src/reset_password/reset";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -42,6 +44,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/feed" element={<Feed />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
