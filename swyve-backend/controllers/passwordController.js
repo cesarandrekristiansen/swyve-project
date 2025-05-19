@@ -32,7 +32,7 @@ exports.forgotPassword = async (req, res, next) => {
 
       const u = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
       if (!u.rows.length) {
-        return res.json({ message: "Om e-post finnes, er lenke sendt." });
+        return res.json({ message: "if email, sends mail" });
       }
       const userId = u.rows[0].id;
   
@@ -87,7 +87,7 @@ exports.resetPassword = async (req, res, next) => {
       [token]
     );
     if (!pr.rows.length || new Date() > pr.rows[0].expires_at) {
-      return res.status(400).json({ error: "Ugyldig eller utløpt token" });
+      return res.status(400).json({ error: "token expired" });
     }
     const userId = pr.rows[0].user_id;
 
