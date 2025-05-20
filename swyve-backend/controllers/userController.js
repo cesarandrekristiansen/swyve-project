@@ -6,12 +6,9 @@ const supabase = require("../services/supabaseService");
 exports.getUserProfile = async (req, res) => {
   const { userId } = req.params;
 
-  // Optionally validate userId if you want
-  // e.g., with express-validator in the route
-
   try {
     const userResult = await pool.query(
-      "SELECT id, username, bio, profile_pic_url FROM users WHERE id = $1",
+      "SELECT id, username, bio, profile_pic_url, cover_pic_url FROM users WHERE id = $1",
       [userId]
     );
     if (userResult.rows.length === 0) {
@@ -48,6 +45,7 @@ exports.getUserProfile = async (req, res) => {
       username: userRow.username,
       bio: userRow.bio,
       profile_pic_url: userRow.profile_pic_url,
+      cover_pic_url: userRow.cover_pic_url,
       followers: followersCount,
       following: followingCount,
       totalLikesCount,
@@ -156,6 +154,54 @@ exports.updateProfilePic = async (req, res) => {
     });
   } catch (err) {
     console.error("Error updating profile pic:", err);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+exports.updateCoverPic = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+  const userId = req.userId;
+
+  try {
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("profile-pics")
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+      });
+
+    if (uploadError) {
+      console.error("Supabase upload error:", uploadError);
+      throw uploadError;
+    }
+
+    const { data: publicUrlData, error: urlError } = supabase.storage
+      .from("profile-pics")
+      .getPublicUrl(uploadData.path);
+
+    if (urlError) {
+      console.error("Supabase public URL error:", urlError);
+      throw urlError;
+    }
+
+    const finalPicUrl = publicUrlData.publicUrl;
+
+    const result = await pool.query(
+      "UPDATE users SET cover_pic_url = $1 WHERE id = $2 RETURNING id, username, bio, cover_pic_url",
+      [finalPicUrl, userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      message: "Cover picture updated",
+      user: result.rows[0],
+    });
+  } catch (err) {
+    console.error("Error updating cover pic:", err);
     return res.status(500).json({ error: err.message });
   }
 };

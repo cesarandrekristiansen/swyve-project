@@ -29,7 +29,7 @@ function Search() {
         .catch(console.error)
         .finally(() => setLoading(false));
     }
-  }, [inputFocused]);
+  }, [inputFocused, backendUrl]);
 
   useEffect(() => {
     if (!query) return;
@@ -54,21 +54,31 @@ function Search() {
 
     setTypingTimeout(timeout);
     return () => clearTimeout(timeout);
-  }, [query, selectedFilter]);
+  }, [query, selectedFilter, backendUrl]);
 
   return (
     <div className="search-page">
       {loading && <Loading />}
+
       <h1>Discover</h1>
+
       <div className="search-wrapper">
         <input
           ref={inputRef}
           type="text"
           placeholder="Type something..."
           value={query}
-          onFocus={() => setInputFocused(true)}
-          onChange={(e) => setQuery(e.target.value)}
           className="search-input"
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => {
+            if (query.trim() === "") {
+              setInputFocused(false);
+              setSelectedFilter(null);
+              setUserResults([]);
+              setHashtagResults([]);
+            }
+          }}
+          onChange={(e) => setQuery(e.target.value)}
         />
         <FaSearch className="search-icon" />
       </div>

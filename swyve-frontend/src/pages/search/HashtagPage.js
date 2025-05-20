@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 import "./HashtagPage.css";
 import HashtagFeedModal from "./HashtagFeedModal";
 import Loading from "../../components/loading/Loading";
 
 function HashtagPage() {
   const { tag } = useParams();
+  const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
@@ -37,6 +39,13 @@ function HashtagPage() {
 
   return (
     <div className="hashtag-page">
+      <button
+        className="back-button"
+        onClick={() => navigate(-1)}
+        aria-label="Go back"
+      >
+        <FaArrowLeft />
+      </button>
       {loading && <Loading />}
       <h2>#{tag}</h2>
       <p className="hashtag-description">

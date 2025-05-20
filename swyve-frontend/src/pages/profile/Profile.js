@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { /*useNavigate,*/ useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./Profile.css";
 import { useAuth } from "../../../src/auth/AuthContext";
-import { FaVideo, FaHeart } from "react-icons/fa";
+import { FaVideo, FaHeart, FaArrowLeft, FaCamera } from "react-icons/fa";
 import ProfileFeedModal from "./ProfileFeedModal";
 import Loading from "../../components/loading/Loading";
 
 function Profile() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
   const { profileId } = useParams();
   const { user: currentUser } = useAuth();
@@ -29,12 +29,10 @@ function Profile() {
   const [editingBio, setEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState("");
 
-  // Fetch profile data
   useEffect(() => {
     if (!profileId) return;
     setLoading(true);
 
-    // Kick off both requests together
     const p1 = fetch(`${BASE_URL}/api/users/${profileId}`, {
       credentials: "include",
     })
@@ -209,10 +207,32 @@ function Profile() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!data.user) throw new Error("Error updating pic");
+        if (!data.user) throw new Error("Error updating profile pic");
         setProfileData((prev) => ({
           ...prev,
           profile_pic_url: data.user.profile_pic_url,
+        }));
+      })
+      .catch(console.error);
+  };
+
+  const handleCoverPicChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("coverPic", file);
+
+    fetch(`${BASE_URL}/api/users/me/cover-pic`, {
+      method: "PUT",
+      credentials: "include",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.user) throw new Error("Error updating cover pic");
+        setProfileData((prev) => ({
+          ...prev,
+          cover_pic_url: data.user.cover_pic_url,
         }));
       })
       .catch(console.error);
@@ -251,42 +271,75 @@ function Profile() {
   return (
     <div className="profile-page">
       {loading && <Loading />}
+      {!isMyProfile && (
+        <button
+          className="back-button"
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+        >
+          <FaArrowLeft />
+        </button>
+      )}
       {profileData && (
         <>
-          {editingUsername ? (
-            <input
-              type="text"
-              className="username-edit"
-              value={tempUsername}
-              onChange={(e) => setTempUsername(e.target.value)}
-              onBlur={saveUsername}
-              onKeyDown={(e) => e.key === "Enter" && saveUsername()}
-            />
-          ) : (
-            <h2
-              className="top-username"
-              onClick={() => isMyProfile && setEditingUsername(true)}
-            >
-              {profileData.username}
-            </h2>
+          {(isMyProfile || profileData.cover_pic_url) && (
+            <div className="cover-container">
+              {/* if there’s a cover, show it */}
+              {profileData.cover_pic_url && (
+                <img
+                  className="cover-pic"
+                  src={profileData.cover_pic_url}
+                  alt="Cover"
+                />
+              )}
+
+              {/* always include the hidden file input */}
+              {isMyProfile && (
+                <>
+                  <input
+                    id="coverInput"
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleCoverPicChange}
+                  />
+
+                  {/* button to trigger it */}
+                  <button
+                    type="button"
+                    className="cover-button"
+                    onClick={() =>
+                      document.getElementById("coverInput").click()
+                    }
+                  >
+                    <FaCamera />
+                    {profileData.cover_pic_url
+                      ? "Edit cover photo"
+                      : "Add cover photo"}
+                  </button>
+                </>
+              )}
+            </div>
           )}
 
-          <img
-            className="profile-pic"
-            src={profileData.profile_pic_url || "/images/profile-pic.png"}
-            alt="Profile"
-            onClick={() =>
-              isMyProfile && document.getElementById("picInput").click()
-            }
-            style={{ cursor: isMyProfile ? "pointer" : "default" }}
-          />
-          <input
-            id="picInput"
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleProfilePicChange}
-          />
+          <div className="profile-header">
+            <img
+              className="profile-pic"
+              src={profileData.profile_pic_url || "/images/profile-pic.png"}
+              alt="Profile"
+              onClick={() =>
+                isMyProfile && document.getElementById("picInput").click()
+              }
+              style={{ cursor: isMyProfile ? "pointer" : "default" }}
+            />
+            <input
+              id="picInput"
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleProfilePicChange}
+            />
+          </div>
 
           {editingUsername ? (
             <input

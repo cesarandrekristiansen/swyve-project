@@ -5,6 +5,7 @@ const {
   updateUsername,
   updateBio,
   updateProfilePic,
+  updateCoverPic,
 } = require("../controllers/userController");
 const { body, param } = require("express-validator");
 
@@ -47,6 +48,13 @@ router.put(
   authMiddleware,
   uploadImage.single("profilePic"),
   updateProfilePic
+);
+
+router.put(
+  "/api/users/me/cover-pic",
+  authMiddleware,
+  uploadImage.single("coverPic"),
+  updateCoverPic
 );
 
 module.exports = router;
