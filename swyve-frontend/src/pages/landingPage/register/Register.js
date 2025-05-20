@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../LandingPage.css";
 import "./Register.css";
+import Loading from "../../../components/loading/Loading";
 
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
   const navigate = useNavigate();
 
   const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
   const handleRegister = async () => {
+    setAuthLoading(true);
     try {
       const response = await fetch(`${backendUrl}/register`, {
         method: "POST",
@@ -28,12 +31,14 @@ function Register() {
       }
     } catch (err) {
       setMessage("Error registering user.");
+    } finally {
+      setAuthLoading(false);
     }
   };
 
   return (
     <div className="landing-container">
-      {/* Left brand panel */}
+      {authLoading && <Loading />}
       <div className="landing-left">
         <div className="brand-section">
           <div className="logo-title-row">
@@ -47,8 +52,6 @@ function Register() {
           <h2>Create your account</h2>
         </div>
       </div>
-
-      {/* Right form panel */}
       <div className="landing-right">
         <div className="login-form">
           <h2>Sign up</h2>

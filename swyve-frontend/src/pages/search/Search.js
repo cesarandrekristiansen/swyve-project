@@ -3,6 +3,8 @@ import { FaSearch } from "react-icons/fa";
 import "./Search.css";
 import { useNavigate } from "react-router-dom";
 import HashtagCard from "./HashtagCard.js";
+import Loading from "../../components/loading/Loading";
+
 function Search() {
   const [query, setQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState(null);
@@ -11,6 +13,7 @@ function Search() {
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [inputFocused, setInputFocused] = useState(false);
   const [popularHashtags, setPopularHashtags] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const inputRef = useRef();
   const navigate = useNavigate();
@@ -19,35 +22,34 @@ function Search() {
 
   useEffect(() => {
     if (!inputFocused) {
+      setLoading(true);
       fetch(`${backendUrl}/api/hashtags/top`)
         .then((res) => res.json())
         .then(setPopularHashtags)
-        .catch(console.error);
+        .catch(console.error)
+        .finally(() => setLoading(false));
     }
   }, [inputFocused]);
 
   useEffect(() => {
-    if (!query) {
-      setUserResults([]);
-      setHashtagResults([]);
-      return;
-    }
-
-    if (typingTimeout) clearTimeout(typingTimeout);
+    if (!query) return;
+    clearTimeout(typingTimeout);
     const timeout = setTimeout(() => {
-      if (selectedFilter === "user" || !selectedFilter) {
-        fetch(`${backendUrl}/api/search/users?query=${query}`)
-          .then((res) => res.json())
-          .then(setUserResults)
-          .catch(console.error);
-      }
-
-      if (selectedFilter === "hashtag" || !selectedFilter) {
-        fetch(`${backendUrl}/api/search/hashtags?query=${query}`)
-          .then((res) => res.json())
-          .then(setHashtagResults) // this will now be the list of hashtags
-          .catch(console.error);
-      }
+      setLoading(true);
+      Promise.all([
+        (selectedFilter !== "hashtag" &&
+          fetch(`${backendUrl}/api/search/users?query=${query}`)
+            .then((r) => r.json())
+            .then(setUserResults)) ||
+          Promise.resolve(),
+        (selectedFilter !== "user" &&
+          fetch(`${backendUrl}/api/search/hashtags?query=${query}`)
+            .then((r) => r.json())
+            .then(setHashtagResults)) ||
+          Promise.resolve(),
+      ])
+        .catch(console.error)
+        .finally(() => setLoading(false));
     }, 300);
 
     setTypingTimeout(timeout);
@@ -56,8 +58,8 @@ function Search() {
 
   return (
     <div className="search-page">
+      {loading && <Loading />}
       <h1>Discover</h1>
-
       <div className="search-wrapper">
         <input
           ref={inputRef}

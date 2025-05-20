@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { /*useNavigate,*/ useParams } from "react-router-dom";
 import "./Profile.css";
 import { useAuth } from "../../../src/auth/AuthContext";
 import { FaVideo, FaHeart } from "react-icons/fa";
 import ProfileFeedModal from "./ProfileFeedModal";
+import Loading from "../../components/loading/Loading";
 
 function Profile() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
   const { profileId } = useParams();
   const { user: currentUser } = useAuth();
@@ -21,6 +22,7 @@ function Profile() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const [editingUsername, setEditingUsername] = useState(false);
   const [tempUsername, setTempUsername] = useState("");
@@ -30,26 +32,27 @@ function Profile() {
   // Fetch profile data
   useEffect(() => {
     if (!profileId) return;
+    setLoading(true);
 
-    fetch(`${BASE_URL}/api/users/${profileId}`, {
+    // Kick off both requests together
+    const p1 = fetch(`${BASE_URL}/api/users/${profileId}`, {
       credentials: "include",
     })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((data) => {
-            throw new Error(data.error || "Error fetching user profile");
-          });
-        }
-        return res.json();
-      })
-      .then((userData) => {
-        setProfileData(userData); // userData = { id, username, bio, profile_pic_url, followers, following, totalLikes }
-        console.log("Fetched user data:", userData);
-      })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(setProfileData);
+
+    const p2 = fetch(`${BASE_URL}/api/users/${profileId}/videos`, {
+      credentials: "include",
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(setUserVideos);
+
+    Promise.all([p1, p2])
       .catch((err) => {
         console.error(err);
         setError(err.message);
-      });
+      })
+      .finally(() => setLoading(false));
   }, [BASE_URL, profileId]);
 
   // Update temp values for inline edit when profileData loads/changes
@@ -93,30 +96,6 @@ function Profile() {
       .catch((error) => console.error("Error fetching playlists:", error));
   }, [BASE_URL, profileId]);
 
-  // 4) Fetch this user’s uploaded videos
-  useEffect(() => {
-    if (!profileId) return;
-    fetch(`${BASE_URL}/api/users/${profileId}/videos`, {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((data) => {
-            throw new Error(data.error || "Error fetching videos");
-          });
-        }
-        return res.json();
-      })
-      .then((videos) => {
-        console.log("Fetched user videos:", videos);
-        setUserVideos(videos);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err.message);
-      });
-  }, [BASE_URL, profileId]);
-
   // Fetch liked videos
   useEffect(() => {
     // /api/users/:userId/liked
@@ -136,7 +115,7 @@ function Profile() {
         setLikedVideos(videos);
       })
       .catch((err) => console.error(err));
-  }, [playlists, BASE_URL]);
+  }, [playlists, BASE_URL, profileId]);
 
   const handleFollowClick = () => {
     const newIsFollowing = !isFollowing;
@@ -246,6 +225,7 @@ function Profile() {
     );
   }
 
+  /*
   const handleLogout = async () => {
     await fetch(`${BASE_URL}/logout`, {
       method: "POST",
@@ -254,11 +234,7 @@ function Profile() {
     // navigate to login
     navigate("/");
   };
-
-  const handleEdit = () => {
-    // Add logic to edit the profile if needed.
-    console.log("Edit profile clicked.");
-  };
+  */
 
   const enrichedVideos =
     activeTab === "liked" && isMyProfile
@@ -274,6 +250,7 @@ function Profile() {
 
   return (
     <div className="profile-page">
+      {loading && <Loading />}
       {profileData && (
         <>
           {editingUsername ? (

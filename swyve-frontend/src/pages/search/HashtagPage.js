@@ -2,16 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./HashtagPage.css";
 import HashtagFeedModal from "./HashtagFeedModal";
+import Loading from "../../components/loading/Loading";
 
 function HashtagPage() {
   const { tag } = useParams();
   const [videos, setVideos] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const baseUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
   useEffect(() => {
+    setLoading(true);
     fetch(`${baseUrl}/api/hashtags/${tag}/videos`, {
       credentials: "include",
     })
@@ -28,11 +31,13 @@ function HashtagPage() {
         }));
         setVideos(enriched);
       })
-      .catch(console.error);
-  }, [tag]);
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [tag, baseUrl]);
 
   return (
     <div className="hashtag-page">
+      {loading && <Loading />}
       <h2>#{tag}</h2>
       <p className="hashtag-description">
         Discover videos tagged with <strong>#{tag}</strong>

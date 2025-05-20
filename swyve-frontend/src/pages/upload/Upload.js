@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Upload.css";
+import Loading from "../../components/loading/Loading";
 
 function Upload() {
   const [file, setFile] = useState(null);
@@ -124,6 +125,7 @@ function Upload() {
 
   return (
     <div className="upload-page">
+      {uploading && <Loading />}
       <h2 className="upload-title">Upload Your Video</h2>
 
       <div className="upload-form">

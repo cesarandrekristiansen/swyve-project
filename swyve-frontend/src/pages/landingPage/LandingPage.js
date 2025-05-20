@@ -3,12 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LandingPage.css";
 import { useAuth } from "../../auth/AuthContext";
+import Loading from "../../components/loading/Loading";
 
 function LandingPage() {
   const { user, setUser, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +29,7 @@ function LandingPage() {
   const backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
   const handleLogin = async () => {
+    setAuthLoading(true);
     try {
       const response = await fetch(`${backendUrl}/login`, {
         method: "POST",
@@ -49,6 +52,8 @@ function LandingPage() {
       }
     } catch (error) {
       setMessage("Error logging in.");
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -56,6 +61,7 @@ function LandingPage() {
 
   return (
     <div className="landing-container">
+      {authLoading && <Loading />}
       <div className="landing-left">
         <div className="brand-section">
           <div className="logo-title-row">
