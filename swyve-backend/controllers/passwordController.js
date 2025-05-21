@@ -12,6 +12,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.MANDRILL_USER,    
     pass: process.env.MANDRILL_API_KEY
   },
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 transporter.verify((err, success) => {
     if (err) {
