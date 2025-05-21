@@ -48,7 +48,7 @@ exports.forgotPassword = async (req, res, next) => {
   
       const link = `${FRONTEND}/reset-password?token=${token}`;
       const mailOptions = {
-        from: `"Support" <${process.env.MANDRILL_USER}>`,
+        from: `"Support" <${process.env.SMTP_USER}>`,
         to: email,
         subject: "Reset Password",
         text: [
