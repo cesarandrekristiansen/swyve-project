@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { sendResetEmail } from "../services/passwordService"
+import "./passwordReset.css"
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

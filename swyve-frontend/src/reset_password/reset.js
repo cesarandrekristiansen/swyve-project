@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { resetPassword } from "../services/passwordService";
+import "./passwordReset.css"
 
 export default function ResetPassword() {
   const [newPass, setNewPass] = useState("");
