@@ -4,6 +4,12 @@ const jwt = require("jsonwebtoken");
 const pool = require("../db/pool");
 const JWT_SECRET = process.env.JWT_SECRET;
 
+const Mailchimp = require("@mailchimp/mailchimp_marketing");
+Mailchimp.setConfig({
+  apiKey: process.env.MAILCHIMP_API_KEY,
+  server: process.env.MAILCHIMP_SERVER_PREFIX,
+});
+
 exports.register = async (req, res) => {
   // Handle validation errors
   const errors = validationResult(req);
@@ -18,6 +24,21 @@ exports.register = async (req, res) => {
       "INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING id",
       [email, hashedPassword, username]
     );
+
+    try {
+      await Mailchimp.lists.addListMember(process.env.MAILCHIMP_LIST_ID, {
+        email_address: email,
+        status: "subscribed",       
+        merge_fields: {
+          FNAME: username, 
+        },
+      });
+      console.log("Mailchimp: User added to mailchimp!");
+    } catch (mcErr) {
+      console.error("Mailchimp-feil:", mcErr);
+
+    }
+
     res
       .status(201)
       .send({ message: "User registered successfully", id: result.rows[0].id });
