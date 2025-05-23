@@ -33,7 +33,7 @@ exports.register = async (req, res) => {
             status: "subscribed",
             merge_fields: { FNAME: username }
           },
-          { skip_merge_validation: true } 
+          { skipMergeValidation: true } 
         );
         console.log("Mailchimp: Bruker lagt til i lista (med skip_merge_validation)");        
     }
