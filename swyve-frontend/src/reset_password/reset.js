@@ -20,7 +20,7 @@ export default function ResetPassword() {
     try {
       await resetPassword(token, newPass);
       setMsg("Password changed! Now Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
       setMsg(err.message);
     }
