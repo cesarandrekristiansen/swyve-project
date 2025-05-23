@@ -28,7 +28,7 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="reset-password-container">
+    <div className="forgot-password-container">
       <h2>Reset Password</h2>
       <form onSubmit={handleSubmit}>
         <input
