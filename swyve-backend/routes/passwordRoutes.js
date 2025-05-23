@@ -4,16 +4,15 @@ const ctrl = require("../controllers/passwordController");
 
 const router = express.Router();
 
-const FRONTEND = process.env.FRONTEND_URL;
 
 router.post(
-  `${FRONTEND}/forgot-password`,
+  `/forgot-password`,
   body("email").isEmail().withMessage("Må være en gyldig e-post"),
   ctrl.forgotPassword
 );
 
 router.post(
-  `${FRONTEND}/reset-password`,
+  `/reset-password`,
   body("token").notEmpty().withMessage("Token mangler"),
   body("newPassword")
     .isLength({ min: 6 })
