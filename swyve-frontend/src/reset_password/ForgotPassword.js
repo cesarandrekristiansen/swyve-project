@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { sendResetEmail } from "../services/redirect";
+import { sendResetEmail } from "../services/passwordService"
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -8,11 +8,10 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ message: "", error: false });
-
     try {
       await sendResetEmail(email);
       setStatus({
-        message: "Check your email for a reset link!",
+        message: "Check email for reset mail!",
         error: false,
       });
     } catch (err) {
@@ -22,7 +21,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="forgot-password-container">
-      <h2>Forgot Passord?</h2>
+      <h2>Forgot Password?</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="email">Email</label>
         <input
@@ -30,7 +29,7 @@ export default function ForgotPassword() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Your@email.com"
+          placeholder="your@eemail.com"
           required
         />
         <button type="submit">Send link</button>
