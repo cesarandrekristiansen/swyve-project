@@ -9,6 +9,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const passwordRoutes = require("./routes/passwordRoutes");
+const authRoutes     = require("./routes/authRoutes");
 
 // ========== MIDDLEWARE ==========
 app.use((req, res, next) => {
@@ -21,14 +23,12 @@ app.use(bodyParser.json());
 app.use(corsMiddleware);
 
 // ========== ROUTES ==========
-const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const followRoutes = require("./routes/followRoutes");
 const videoRoutes = require("./routes/videoRoutes");
 const playlistRoutes = require("./routes/playlistRoutes");
 const likeRoutes = require("./routes/likeRoutes");
 const searchRoutes = require("./routes/searchRoutes");
-const passwordRoutes = require("./routes/passwordRoutes");
 app.use(passwordRoutes);
 app.use(authRoutes);
 app.use(userRoutes);
