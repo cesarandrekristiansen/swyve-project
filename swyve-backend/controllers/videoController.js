@@ -63,8 +63,8 @@ exports.saveMetadata = async (req, res) => {
 
 exports.getAllVideos = async (req, res) => {
   const userId = req.userId; // might be undefined if not logged in
-  const limit = parseInt(req.query.limit) || 15;
-  const offset = parseInt(req.query.offset, 15) || 0;
+  const limit = parseInt(req.query.limit) || 7;
+  const offset = parseInt(req.query.offset, 7) || 0;
 
   try {
     // 1) fetch basic info plus total likes
