@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import { FaHeart, FaComment } from "react-icons/fa";
+import { FaHeart, FaComment, FaPlay } from "react-icons/fa";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./VideoCard.css";
@@ -17,6 +17,7 @@ function VideoCard({ video, onProfileClick }) {
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
 
+  const [paused, setPaused] = useState(true);
   // Auto-play/pause
   useEffect(() => {
     const vid = videoRef.current;
@@ -29,6 +30,24 @@ function VideoCard({ video, onProfileClick }) {
       vid.pause();
     }
   }, [inView]);
+
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    const onPlay  = () => setPaused(false);
+    const onPause = () => setPaused(true);
+    vid.addEventListener("play", onPlay);
+    vid.addEventListener("pause", onPause);
+    return () => {
+      vid.removeEventListener("play", onPlay);
+      vid.removeEventListener("pause", onPause);
+    };
+  }, []);
+
+  const handlePlay = () => {
+    const vid = videoRef.current;
+    if (vid) vid.play();
+  };
 
   function handleProfileClick() {
     if (onProfileClick) onProfileClick();
@@ -76,6 +95,11 @@ function VideoCard({ video, onProfileClick }) {
         controls
         preload="metadata"
       />
+     {paused && (
+        <div className="video-paused-overlay" onClick={handlePlay}>
+          <FaPlay />
+        </div>
+      )}
 
       <div className="video-actions">
         <button className="video-action-btn" onClick={handleProfileClick}>

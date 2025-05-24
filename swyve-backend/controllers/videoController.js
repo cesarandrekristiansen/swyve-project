@@ -63,7 +63,8 @@ exports.saveMetadata = async (req, res) => {
 
 exports.getAllVideos = async (req, res) => {
   const userId = req.userId; // might be undefined if not logged in
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = parseInt(req.query.limit) || 15;
+  const offset = parseInt(req.query.offset, 15) || 0;
 
   try {
     // 1) fetch basic info plus total likes
@@ -71,22 +72,20 @@ exports.getAllVideos = async (req, res) => {
     const result = await pool.query(
       `
       SELECT
-        v.id,
-        v.title,
-        v.url,
-        v.user_id,
-        u.username,
-        u.profile_pic_url,
+        v.id, v.title, v.url, v.user_id,
+        u.username, u.profile_pic_url,
         COUNT(vl.id) AS likes_count
       FROM videos v
       JOIN users u ON v.user_id = u.id
       LEFT JOIN video_likes vl ON vl.video_id = v.id
       GROUP BY v.id, u.id
-      ORDER BY RANDOM()
+      ORDER BY v.id DESC             -- eller annen fornuftig rekkefølge
       LIMIT $1
+      OFFSET $2
       `,
-      [limit]
+      [limit, offset]
     );
+
 
     let videos = result.rows; // each row has v.*, u.*, plus likes_count
 

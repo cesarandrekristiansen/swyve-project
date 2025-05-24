@@ -24,7 +24,7 @@ export default function VideoFeed({
     setLoading(true);
     const limit = videos.length === 0 ? INITIAL_LIMIT : SUBSEQUENT_LIMIT;
     try {
-      const res = await fetch(`${backendUrl}/api/videos?limit=${limit}`, {
+      const res = await fetch(`${backendUrl}/api/videos?limit=${limit}&offset=${videos.length}`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch videos");
@@ -74,7 +74,8 @@ export default function VideoFeed({
           ✕
         </button>
       )}
-      <List
+      <List  
+        className="video-feed-container-feed"
         height={window.innerHeight}
         width="100%"
         itemCount={itemCount}
