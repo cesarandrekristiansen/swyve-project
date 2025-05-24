@@ -79,7 +79,7 @@ exports.getAllVideos = async (req, res) => {
       JOIN users u ON v.user_id = u.id
       LEFT JOIN video_likes vl ON vl.video_id = v.id
       GROUP BY v.id, u.id
-      ORDER BY v.id DESC             -- eller annen fornuftig rekkefølge
+      ORDER BY v.id  RANDOM()    
       LIMIT $1
       OFFSET $2
       `,
