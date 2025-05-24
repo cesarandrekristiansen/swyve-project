@@ -75,6 +75,7 @@ export default function VideoFeed({
         </button>
       )}
       <List
+        className="video-feed-container-feed"
         height={window.innerHeight}
         width="100%"
         itemCount={itemCount}
