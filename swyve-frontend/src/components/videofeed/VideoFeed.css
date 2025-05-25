@@ -11,14 +11,17 @@
 }
 
 /* The scroll-snap container used by all feeds */
+/* nå vil modal ha svar backgrunn mens feeden har den normale bakgrunnen */
 .video-feed-container {
+  background: black;
+}
+.video-feed-container-feed, .video-feed-container {
   position: relative;
   width: 100vw;
   height: 100vh;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
-  background: black;
 }
 
 /* Each full-screen slide */

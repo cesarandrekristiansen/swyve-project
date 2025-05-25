@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import "./HashtagPage.css";
 import HashtagFeedModal from "./HashtagFeedModal";
+import thumbnail from "../../logo.png";
 import Loading from "../../components/loading/Loading";
 
 function HashtagPage() {
@@ -62,8 +63,8 @@ function HashtagPage() {
               setModalOpen(true);
             }}
           >
-            <video
-              src={video.url}
+            <img
+              src={thumbnail} // middlertidig løsning
               muted
               playsInline
               preload="metadata"

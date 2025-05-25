@@ -96,7 +96,7 @@ function LandingPage() {
 
           <div className="forgot-password">
             {/* If you have a forgot password route, link it here */}
-            <a href="/forgot">Forgot Password?</a>
+            <a href="/forgot-password">Forgot Password?</a>
           </div>
 
           <button onClick={handleLogin}>Login</button>
