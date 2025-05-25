@@ -297,7 +297,7 @@ function Profile() {
               content={"Check out this creator on Swyve!"}
             />
                  {/*her kan dere legge til profildata.cover_pic_url om det skal være ønskelig*/}
-            <meta property="og:image" content={`https://swyve.io/images/logoShare.png`} />
+            <meta property="og:image" content={"https://swyve.io/images/logoShare.png"} />
             <meta
               property="og:url"
               content={`${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`}
