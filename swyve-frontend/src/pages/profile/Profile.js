@@ -428,7 +428,7 @@ function Profile() {
                     `Check out @${profileData.username} on Swyve!`
                   )}` +
                   `&url=${encodeURIComponent(
-                    `${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`
+                    `${process.env.REACT_APP_SHARE_URL}/`
                   )}`
                 }
                 target="_blank"
