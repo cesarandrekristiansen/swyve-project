@@ -270,10 +270,6 @@ function Profile() {
           isliked: video.isliked ?? false,
           likes_count: video.likes_count || 0,
         }));
-  const FRONTEND = process.env.REACT_APP_SHARE_URL || "https://swyve.io";
-  const imageUrl = profileData?.profile_pic_url
-    ? `${FRONTEND}/${profileData?.profile_pic_url}`
-    : `${FRONTEND}/logoShare.png`;
   return (
     <div className="profile-page">
       {loading && <Loading />}
@@ -298,7 +294,8 @@ function Profile() {
               property="og:description"
               content={"Check out this creator on Swyve!"}
             />
-            <meta property="og:image" content={imageUrl} />
+                 {/*her kan dere legge til profildata.bio om det skal være ønskelig*/}
+            <meta property="og:image" content={`https://swyve.io/images/logoShare.png`} />
             <meta
               property="og:url"
               content={`${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`}
