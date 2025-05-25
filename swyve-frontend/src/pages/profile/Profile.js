@@ -290,12 +290,13 @@ function Profile() {
               property="og:title"
               content={`${profileData.username} on Swyve`}
             />
+       {/*her kan dere legge til profildata.bio om det skal være ønskelig*/}
             <meta
               property="og:description"
               content={"Check out this creator on Swyve!"}
             />
-                 {/*her kan dere legge til profildata.bio om det skal være ønskelig*/}
-            <meta property="og:image" content={`https://swyve.io/images/logoShare.png`} />
+                 {/*her kan dere legge til profildata.cover_pic_url om det skal være ønskelig*/}
+            <meta property="og:image" content={`https://swyve.io/images/test.jpeg`} />
             <meta
               property="og:url"
               content={`${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`}
