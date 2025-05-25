@@ -8,19 +8,31 @@ const SUBSEQUENT_LIMIT = 5;
 const SCROLL_THRESHOLD_PX = 600;
 
 export default function VideoFeed({
+  videos: controlledVideos,
+  hasMore: hasMoreProp = false,
+  onLoadMore,
   backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000",
   startIndex = 0,
   onClose,
 }) {
+  const isControlled = Array.isArray(controlledVideos);
   const [videos, setVideos] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMoreInternal, setHasMoreInternal] = useState(true);
   const [loading, setLoading] = useState(false);
   const didLoadOnce = useRef(false);
   const listRef = useRef(null);
   const outerRef = useRef(null);
 
   const loadVideos = useCallback(async () => {
-    if (loading || !hasMore) return;
+    if (isControlled) {
+      if (onLoadMore && hasMoreProp && !loading) {
+        setLoading(true);
+        await onLoadMore();
+        setLoading(false);
+      }
+      return;
+    }
+    if (loading || !hasMoreInternal) return;
     setLoading(true);
     const limit = videos.length === 0 ? INITIAL_LIMIT : SUBSEQUENT_LIMIT;
     try {
@@ -30,42 +42,54 @@ export default function VideoFeed({
       if (!res.ok) throw new Error("Failed to fetch videos");
       const data = await res.json();
       setVideos(prev => [...prev, ...data]);
-      if (data.length < limit) setHasMore(false);
+      if (data.length < limit) setHasMoreInternal(false);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [backendUrl, loading, hasMore, videos.length]);
+  }, [
+    backendUrl,
+    loading,
+    hasMoreInternal,
+    videos.length,
+    isControlled,
+    hasMoreProp,
+    onLoadMore,
+  ]);
 
-  // Initial load + prefetch
   useEffect(() => {
+    if (isControlled) return;
     if (didLoadOnce.current) return;
     didLoadOnce.current = true;
-    loadVideos().then(() => {
-      if (hasMore) loadVideos();
-    });
-  }, [loadVideos, hasMore]);
 
-  // Scroll to startIndex
+    loadVideos().then(() => {
+      if (hasMoreInternal) loadVideos();
+    });
+  }, [loadVideos, hasMoreInternal, isControlled]);
+
   useEffect(() => {
     if (listRef.current && startIndex > 0) {
       listRef.current.scrollToItem(startIndex, "start");
     }
   }, [startIndex]);
 
-  const itemCount = hasMore ? videos.length + 1 : videos.length;
+  const itemCount = isControlled
+    ? controlledVideos.length
+    : hasMoreInternal
+    ? videos.length + 1
+    : videos.length;
 
-  // onScroll med terskel
+  // Infinite‐scroll threshold handler
   const handleScroll = useCallback(() => {
-    if (loading || !hasMore) return;
+    if (loading || !(isControlled ? hasMoreProp : hasMoreInternal)) return;
     const el = outerRef.current;
     if (!el) return;
     const { scrollTop, scrollHeight, clientHeight } = el;
     if (scrollHeight - (scrollTop + clientHeight) < SCROLL_THRESHOLD_PX) {
       loadVideos();
     }
-  }, [loading, hasMore, loadVideos]);
+  }, [loading, isControlled, hasMoreProp, hasMoreInternal, loadVideos]);
 
   return (
     <div className="video-feed-background">
@@ -85,9 +109,12 @@ export default function VideoFeed({
         outerRef={outerRef}
         onScroll={handleScroll}
         onItemsRendered={({ visibleStopIndex }) => {
+          const lastIndex = isControlled
+            ? controlledVideos.length - 1
+            : videos.length - 1;
           if (
-            visibleStopIndex >= videos.length - 1 &&
-            hasMore &&
+            visibleStopIndex >= lastIndex &&
+            (isControlled ? hasMoreProp : hasMoreInternal) &&
             !loading
           ) {
             loadVideos();
@@ -95,16 +122,19 @@ export default function VideoFeed({
         }}
       >
         {({ index, style }) => {
-          if (index === videos.length) {
+          if (!isControlled && index === videos.length) {
             return (
               <div style={style} className="loading-item">
-                {loading ? "Laster…" : ""}
+                {loading ? "Loading…" : ""}
               </div>
             );
           }
+          const vid = isControlled
+            ? controlledVideos[index]
+            : videos[index];
           return (
             <div style={style} className="video-feed-slide">
-              <VideoCard video={videos[index]} />
+              <VideoCard video={vid} />
             </div>
           );
         }}
