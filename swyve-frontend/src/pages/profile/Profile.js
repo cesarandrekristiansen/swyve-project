@@ -271,10 +271,6 @@ function Profile() {
           likes_count: video.likes_count || 0,
           comment_count: video.comment_count || 0,
         }));
-  const FRONTEND = process.env.REACT_APP_SHARE_URL || "https://swyve.io";
-  const imageUrl = profileData?.profile_pic_url
-    ? `${FRONTEND}/${profileData?.profile_pic_url}`
-    : `${FRONTEND}/logo.png`;
   return (
     <div className="profile-page">
       {loading && <Loading />}
@@ -295,11 +291,13 @@ function Profile() {
               property="og:title"
               content={`${profileData.username} on Swyve`}
             />
+       {/*her kan dere legge til profildata.bio om det skal være ønskelig*/}
             <meta
               property="og:description"
-              content={profileData.bio || "Check out this creator on Swyve!"}
+              content={"Check out this creator on Swyve!"}
             />
-            <meta property="og:image" content={imageUrl} />
+                 {/*her kan dere legge til profildata.cover_pic_url om det skal være ønskelig*/}
+            <meta property="og:image" content={`https://swyve.io/images/test.jpeg`} />
             <meta
               property="og:url"
               content={`${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`}
@@ -312,9 +310,8 @@ function Profile() {
             />
             <meta
               name="twitter:description"
-              content={profileData.bio || "Discover videos and more!"}
+              content={"Discover videos and more!"}
             />
-            <meta name="twitter:image" content={imageUrl} />
           </Helmet>
           {(isMyProfile || profileData.cover_pic_url) && (
             <div className="cover-container">

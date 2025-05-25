@@ -55,8 +55,6 @@ export default function VideoFeed({
       const data = await res.json();
       setVideos((prev) => [...prev, ...data]);
       if (data.length < limit) setHasMoreInternal(false);
-      setVideos((prev) => [...prev, ...data]);
-      if (data.length < limit) setHasMoreInternal(false);
     } catch (err) {
       console.error(err);
     } finally {
