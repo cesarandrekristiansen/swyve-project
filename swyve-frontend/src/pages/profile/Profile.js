@@ -273,7 +273,7 @@ function Profile() {
   const FRONTEND = process.env.REACT_APP_SHARE_URL || "https://swyve.io";
   const imageUrl = profileData?.profile_pic_url
     ? `${FRONTEND}/${profileData?.profile_pic_url}`
-    : `${FRONTEND}/logo.png`;
+    : `${FRONTEND}/logoShare.png`;
   return (
     <div className="profile-page">
       {loading && <Loading />}
@@ -428,7 +428,7 @@ function Profile() {
                     `Check out @${profileData.username} on Swyve!`
                   )}` +
                   `&url=${encodeURIComponent(
-                    `${process.env.REACT_APP_SHARE_URL}/`
+                    `${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`
                   )}`
                 }
                 target="_blank"
@@ -479,7 +479,7 @@ function Profile() {
                     `Check out @${profileData.username} on Swyve!`
                   )}` +
                   `&url=${encodeURIComponent(
-                    `${process.env.REACT_APP_SHARE_URL}`
+                    `${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`
                   )}`
                 }
                 target="_blank"
