@@ -296,7 +296,7 @@ function Profile() {
             />
             <meta
               property="og:description"
-              content={profileData.bio || "Check out this creator on Swyve!"}
+              content={"Check out this creator on Swyve!"}
             />
             <meta property="og:image" content={imageUrl} />
             <meta
@@ -311,7 +311,7 @@ function Profile() {
             />
             <meta
               name="twitter:description"
-              content={profileData.bio || "Discover videos and more!"}
+              content={"Discover videos and more!"}
             />
           </Helmet>
           {(isMyProfile || profileData.cover_pic_url) && (
