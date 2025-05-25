@@ -313,7 +313,6 @@ function Profile() {
               name="twitter:description"
               content={profileData.bio || "Discover videos and more!"}
             />
-            <meta name="twitter:image" content={imageUrl} />
           </Helmet>
           {(isMyProfile || profileData.cover_pic_url) && (
             <div className="cover-container">
