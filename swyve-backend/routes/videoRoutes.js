@@ -5,6 +5,7 @@ const {
   saveMetadata,
   getAllVideos,
   getUserVideos,
+  getFollowingVideos,
 } = require("../controllers/videoController");
 
 const router = express.Router();
@@ -37,5 +38,7 @@ router.get(
   [param("userId").isInt().withMessage("userId must be an integer")],
   getUserVideos
 );
+
+router.get("/api/videos/following", authMiddleware, getFollowingVideos);
 
 module.exports = router;

@@ -323,7 +323,15 @@ function Profile() {
             </div>
           )}
 
-          <div className="profile-header">
+          <div
+            className="profile-header"
+            style={{
+              marginTop:
+                isMyProfile || profileData.cover_pic_url ? "-50px" : "0",
+              paddingTop:
+                isMyProfile || profileData.cover_pic_url ? "0px" : "40px",
+            }}
+          >
             <img
               className="profile-pic"
               src={profileData.profile_pic_url || "/images/profile-pic.png"}
@@ -438,6 +446,7 @@ function Profile() {
                   playsInline
                   preload="metadata"
                   className="profile-video"
+                  alt="thumbnail"
                 />
               </div>
             ))}

@@ -11,10 +11,12 @@ export default function VideoFeed({
   backendUrl = process.env.REACT_APP_BASE_URL || "http://localhost:5000",
   startIndex = 0,
   onClose,
+  showTabs = false,
 }) {
   const [videos, setVideos] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("for-you");
   const didLoadOnce = useRef(false);
   const listRef = useRef(null);
   const outerRef = useRef(null);
@@ -22,21 +24,38 @@ export default function VideoFeed({
   const loadVideos = useCallback(async () => {
     if (loading || !hasMore) return;
     setLoading(true);
+
     const limit = videos.length === 0 ? INITIAL_LIMIT : SUBSEQUENT_LIMIT;
+
+    const offset = videos.length;
+
+    // choose endpoint based on tab
+    const path =
+      selectedTab === "following" ? "/api/videos/following" : "/api/videos";
+    const url = `${backendUrl}${path}?limit=${limit}&offset=${offset}`;
+
     try {
-      const res = await fetch(`${backendUrl}/api/videos?limit=${limit}`, {
+      const res = await fetch(url, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to fetch videos");
       const data = await res.json();
-      setVideos(prev => [...prev, ...data]);
+      setVideos((prev) => [...prev, ...data]);
       if (data.length < limit) setHasMore(false);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [backendUrl, loading, hasMore, videos.length]);
+  }, [backendUrl, loading, hasMore, videos.length, selectedTab]);
+
+  // Reset & reload when tab changes
+  useEffect(() => {
+    setVideos([]);
+    setHasMore(true);
+    didLoadOnce.current = false;
+    if (listRef.current) listRef.current.scrollToItem(0);
+  }, [selectedTab]);
 
   // Initial load + prefetch
   useEffect(() => {
@@ -69,11 +88,28 @@ export default function VideoFeed({
 
   return (
     <div className="video-feed-background">
+      {showTabs && (
+        <div className="feed-tabs">
+          <button
+            className={selectedTab === "for-you" ? "tab active" : "tab"}
+            onClick={() => setSelectedTab("for-you")}
+          >
+            For you
+          </button>
+          <button
+            className={selectedTab === "following" ? "tab active" : "tab"}
+            onClick={() => setSelectedTab("following")}
+          >
+            Following
+          </button>
+        </div>
+      )}
       {onClose && (
         <button className="video-feed-close" onClick={onClose}>
           ✕
         </button>
       )}
+
       <List
         className="video-feed-container-feed"
         height={window.innerHeight}
@@ -85,11 +121,7 @@ export default function VideoFeed({
         outerRef={outerRef}
         onScroll={handleScroll}
         onItemsRendered={({ visibleStopIndex }) => {
-          if (
-            visibleStopIndex >= videos.length - 1 &&
-            hasMore &&
-            !loading
-          ) {
+          if (visibleStopIndex >= videos.length - 1 && hasMore && !loading) {
             loadVideos();
           }
         }}

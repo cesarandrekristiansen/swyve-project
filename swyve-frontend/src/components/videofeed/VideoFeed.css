@@ -15,7 +15,8 @@
 .video-feed-container {
   background: black;
 }
-.video-feed-container-feed, .video-feed-container {
+.video-feed-container-feed,
+.video-feed-container {
   position: relative;
   width: 100vw;
   height: 100vh;
@@ -52,4 +53,41 @@
   padding: 16px;
   color: white;
   font-size: 16px;
+}
+
+.feed-tabs {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 24px;
+  z-index: 20; /* above video overlay & actions */
+}
+
+.feed-tabs .tab {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.feed-tabs .tab.active {
+  color: #fff;
+  font-weight: bold;
+  border-bottom: none;
+  position: relative;
+}
+
+.feed-tabs .tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0; /* sits at the very bottom of the tab */
+  left: 50%; /* start in the horizontal center */
+  transform: translateX(-50%);
+  width: 30px; /* your desired underline length */
+  height: 2px; /* thickness of the line */
+  background-color: #fff; /* same color as before */
 }

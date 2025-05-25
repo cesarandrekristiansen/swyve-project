@@ -183,3 +183,55 @@ exports.getUserVideos = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+exports.getFollowingVideos = async (req, res) => {
+  const userId = req.userId; // set by authMiddleware
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = parseInt(req.query.offset) || 0;
+
+  try {
+    // 1) Fetch videos from users this user follows
+    const result = await pool.query(
+      `
+      SELECT
+        v.id,
+        v.title,
+        v.url,
+        v.user_id,
+        u.username,
+        u.profile_pic_url,
+        COUNT(vl.id) AS likes_count
+      FROM follows f
+      JOIN videos v     ON v.user_id = f.followed_id
+      JOIN users u      ON u.id      = v.user_id
+      LEFT JOIN video_likes vl ON vl.video_id = v.id
+      WHERE f.follower_id = $1
+      GROUP BY v.id, u.id
+      ORDER BY v.id DESC            -- newest first
+      LIMIT $2 OFFSET $3
+      `,
+      [userId, limit, offset]
+    );
+
+    let videos = result.rows;
+
+    // 2) Annotate with isliked
+    if (userId) {
+      const likedResult = await pool.query(
+        `SELECT video_id FROM video_likes WHERE user_id = $1`,
+        [userId]
+      );
+      const likedSet = new Set(likedResult.rows.map((r) => r.video_id));
+      videos = videos.map((v) => ({
+        ...v,
+        isliked: likedSet.has(v.id),
+        likes_count: parseInt(v.likes_count, 10),
+      }));
+    }
+
+    res.json(videos);
+  } catch (err) {
+    console.error("Error in getFollowingVideos:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
