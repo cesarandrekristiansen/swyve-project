@@ -77,10 +77,12 @@ exports.getAllVideos = async (req, res) => {
         v.user_id,
         u.username,
         u.profile_pic_url,
-        COUNT(vl.id) AS likes_count
+        COUNT(DISTINCT vl.id) AS likes_count,
+        COUNT(DISTINCT c.id) AS comment_count
       FROM videos v
       JOIN users u ON v.user_id = u.id
       LEFT JOIN video_likes vl ON vl.video_id = v.id
+      LEFT JOIN comments c ON c.video_id = v.id 
       GROUP BY v.id, u.id
       ORDER BY RANDOM()
       LIMIT $1
@@ -112,6 +114,7 @@ exports.getAllVideos = async (req, res) => {
     videos = videos.map((vid) => ({
       ...vid,
       likes_count: parseInt(vid.likes_count, 10),
+      comment_count: parseInt(vid.comment_count, 10),
     }));
 
     res.json(videos);
@@ -144,10 +147,13 @@ exports.getUserVideos = async (req, res) => {
         v.*, 
         u.username, 
         u.profile_pic_url,
-        COUNT(vl.id) AS likes_count
+        COUNT(DISTINCT vl.id) AS likes_count,
+        COUNT(DISTINCT c.id) AS comment_count
+
       FROM videos v
       JOIN users u ON v.user_id = u.id
       LEFT JOIN video_likes vl ON vl.video_id = v.id
+      LEFT JOIN comments c ON c.video_id = v.id
       WHERE v.user_id = $1
       GROUP BY v.id, u.id
       ORDER BY v.id DESC
@@ -168,12 +174,14 @@ exports.getUserVideos = async (req, res) => {
         ...vid,
         isliked: likedIds.has(vid.id),
         likes_count: parseInt(vid.likes_count, 10),
+        comment_count: parseInt(vid.comment_count, 10),
       }));
     } else {
       videos = videos.map((vid) => ({
         ...vid,
         isliked: false,
         likes_count: parseInt(vid.likes_count, 10),
+        comment_count: parseInt(vid.comment_count, 10),
       }));
     }
 
@@ -200,11 +208,13 @@ exports.getFollowingVideos = async (req, res) => {
         v.user_id,
         u.username,
         u.profile_pic_url,
-        COUNT(vl.id) AS likes_count
+        COUNT(DISTINCT vl.id) AS likes_count,
+        COUNT(DISTINCT c.id) AS comment_count
       FROM follows f
       JOIN videos v     ON v.user_id = f.followed_id
       JOIN users u      ON u.id      = v.user_id
       LEFT JOIN video_likes vl ON vl.video_id = v.id
+      LEFT JOIN comments c ON c.video_id = v.id
       WHERE f.follower_id = $1
       GROUP BY v.id, u.id
       ORDER BY v.id DESC            -- newest first
@@ -226,6 +236,7 @@ exports.getFollowingVideos = async (req, res) => {
         ...v,
         isliked: likedSet.has(v.id),
         likes_count: parseInt(v.likes_count, 10),
+        comment_count: parseInt(v.comment_count, 10),
       }));
     }
 

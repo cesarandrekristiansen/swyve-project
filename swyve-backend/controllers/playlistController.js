@@ -26,11 +26,13 @@ exports.getLikedVideos = async (req, res) => {
         v.*, 
         u.username, 
         u.profile_pic_url,
-        COUNT(vl2.id) AS likes_count
+        COUNT(DISTINCT vl2.id) AS likes_count,
+        COUNT(DISTINCT c.id) AS comment_count
       FROM video_likes vl
       JOIN videos v ON vl.video_id = v.id
       JOIN users u ON v.user_id = u.id
       LEFT JOIN video_likes vl2 ON vl2.video_id = v.id
+      LEFT JOIN comments c ON c.video_id = v.id
       WHERE vl.user_id = $1
       GROUP BY v.id, u.id
       `,
@@ -42,6 +44,7 @@ exports.getLikedVideos = async (req, res) => {
       ...vid,
       isliked: true,
       likes_count: parseInt(vid.likes_count, 10),
+      comment_count: parseInt(vid.comment_count, 10),
     }));
 
     return res.json(enriched);

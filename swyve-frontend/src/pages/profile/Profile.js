@@ -269,6 +269,7 @@ function Profile() {
           user_id: video.user_id || null,
           isliked: video.isliked ?? false,
           likes_count: video.likes_count || 0,
+          comment_count: video.comment_count || 0,
         }));
   const FRONTEND = process.env.REACT_APP_SHARE_URL || "https://swyve.io";
   const imageUrl = profileData?.profile_pic_url

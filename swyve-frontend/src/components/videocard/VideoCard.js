@@ -5,16 +5,29 @@ import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { FaShare, FaPlay } from "react-icons/fa";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import CommentModal from "../comment/CommentModal";
 import "./VideoCard.css";
 
 function VideoCard({ video, onProfileClick }) {
-  const { id, url, username, profile_pic_url, isliked, likes_count, user_id } =
-    video;
+  const {
+    id,
+    url,
+    username,
+    profile_pic_url,
+    isliked,
+    likes_count,
+    comment_count,
+    user_id,
+  } = video;
 
   const { user } = useAuth();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(isliked);
   const [likes, setLikes] = useState(parseInt(likes_count, 10) || 0);
+  const [commentCount, setCommentCount] = useState(
+    parseInt(comment_count, 10) || 0
+  );
+  const [showComments, setShowComments] = useState(false);
 
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
@@ -83,7 +96,7 @@ function VideoCard({ video, onProfileClick }) {
       alert("Please log in to comment.");
       return;
     }
-    alert("Comment functionality not implemented.");
+    setShowComments(true);
   }
 
   return (
@@ -120,8 +133,15 @@ function VideoCard({ video, onProfileClick }) {
           onClick={handleComment}
         >
           <IoChatbubbleEllipsesSharp className="video-action-icon" />
-          <span className="video-action-count">0</span>
+          <span className="video-action-count">{commentCount}</span>
         </button>
+        {showComments && (
+          <CommentModal
+            videoId={id}
+            onClose={() => setShowComments(false)}
+            onCommentPosted={() => setCommentCount((c) => c + 1)}
+          />
+        )}
         <button className="video-action-btn">
           <IoIosSave className="video-action-icon" />
         </button>

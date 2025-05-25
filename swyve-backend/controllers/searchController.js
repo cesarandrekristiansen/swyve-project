@@ -64,10 +64,12 @@ exports.getVideosByHashtag = async (req, res) => {
         v.*, 
         u.username, 
         u.profile_pic_url,
-        COUNT(vl.id) AS likes_count
+        COUNT(DISTINCT vl.id) AS likes_count,
+        COUNT(DISTINCT c.id) AS comment_count
       FROM videos v
       JOIN users u ON v.user_id = u.id
       LEFT JOIN video_likes vl ON vl.video_id = v.id
+      LEFT JOIN comments c ON c.video_id = v.id
       WHERE LOWER(v.tags) LIKE LOWER($1)
       GROUP BY v.id, u.id
       `,
@@ -96,6 +98,7 @@ exports.getVideosByHashtag = async (req, res) => {
       ...vid,
       isliked: likedVideoIds.has(vid.id),
       likes_count: parseInt(vid.likes_count, 10),
+      comment_count: parseInt(vid.comment_count, 10),
     }));
 
     res.json(enriched);

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { FixedSizeList as List } from "react-window";
 import VideoCard from "../videocard/VideoCard";
 import "./VideoFeed.css";
+import Loading from "../../components/loading/Loading";
 
 const INITIAL_LIMIT = 3;
 const SUBSEQUENT_LIMIT = 5;
@@ -116,6 +117,7 @@ export default function VideoFeed({
 
   return (
     <div className="video-feed-background">
+      {loading && <Loading />}
       {showTabs && (
         <div className="feed-tabs">
           <button
