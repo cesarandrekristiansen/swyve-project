@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./Profile.css";
 import { useAuth } from "../../../src/auth/AuthContext";
-import { FaVideo, FaHeart } from "react-icons/fa";
+import { FaVideo, FaHeart,  } from "react-icons/fa";
+import { SiX } from "react-icons/si";
 import ProfileFeedModal from "./ProfileFeedModal";
 import thumbail from "../../logo.png"
+import { Helmet } from "react-helmet";
 
 function Profile() {
   const navigate = useNavigate();
@@ -272,11 +274,26 @@ function Profile() {
           isliked: video.isliked ?? false,
           likes_count: video.likes_count || 0,
         }));
-
+        const FRONTEND = process.env.REACT_APP_SHARE_URL || "https://swyve.io";
+        const imageUrl = profileData?.profile_pic_url
+        ? `${FRONTEND}/${profileData?.profile_pic_url}`
+        : `${FRONTEND}/logo.png`;
   return (
     <div className="profile-page">
       {profileData && (
-        <>
+                <>
+            <Helmet>
+            <title>{profileData.username} | Swyve</title>
+            <meta property="og:title" content={`${profileData.username} on Swyve`} />
+            <meta property="og:description" content={profileData.bio || "Check out this creator on Swyve!"} />
+            <meta property="og:image" content={imageUrl} />
+            <meta property="og:url" content={`${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`} />
+          
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={`${profileData.username} on Swyve`} />
+            <meta name="twitter:description" content={profileData.bio || "Discover videos and more!"} />
+            <meta name="twitter:image" content={imageUrl} />
+          </Helmet>
           {editingUsername ? (
             <input
               type="text"
@@ -351,6 +368,22 @@ function Profile() {
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
               <button className="message-btn">Message</button>
+        <a
+          href={
+            `https://twitter.com/intent/tweet?` +
+            `text=${encodeURIComponent(
+              `Check out @${profileData.username} on Swyve!`
+            )}` +
+            `&url=${encodeURIComponent(
+              `${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`
+            )}`
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-btn"
+        >
+          <SiX /> Share
+        </a>
             </div>
           ) : null}
 
@@ -386,6 +419,22 @@ function Profile() {
               >
                 <FaHeart />
               </button>
+              <a
+          href={
+            `https://twitter.com/intent/tweet?` +
+            `text=${encodeURIComponent(
+              `Check out @${profileData.username} on Swyve!`
+            )}` +
+            `&url=${encodeURIComponent(
+              `${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`
+            )}`
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+          className="share-btn"
+        >
+          <SiX /> Share
+        </a>
             </div>
           )}
 
