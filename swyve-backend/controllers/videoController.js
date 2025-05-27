@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator");
 const supabase = require("../services/supabaseService");
 const pool = require("../db/pool");
+const NodeCache = require("node-cache");
+const cache = new NodeCache({ stdTTL: 120, checkperiod: 180 });
 
 exports.uploadVideo = async (req, res) => {
   console.log("uploadVideo controller is loaded!");
@@ -34,6 +36,7 @@ exports.uploadVideo = async (req, res) => {
 
     const finalPublicUrl = publicUrlData.publicUrl;
     console.log("finalPublicUrl:", finalPublicUrl);
+    cache.del("allVideos");
 
     return res.status(200).json({ videoUrl: finalPublicUrl });
   } catch (err) {
@@ -55,6 +58,8 @@ exports.saveMetadata = async (req, res) => {
       "INSERT INTO videos (title, url, thumbnail, duration, tags, embed_code, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
       [title, videoUrl, thumbnail, duration, tags, embed_code, userId]
     );
+    cache.del("allVideos");
+    cache.del(`userVideos:${userId}`);
     res.json({ message: "Video metadata saved", video: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -64,9 +69,10 @@ exports.saveMetadata = async (req, res) => {
 exports.getAllVideos = async (req, res) => {
   const userId = req.userId; // might be undefined if not logged in
   const limit = parseInt(req.query.limit) || 10;
+  const offset = parseInt(req.query.offset) || 0;            // ← new
 
   try {
-    // 1) fetch basic info plus total likes
+        // 1) fetch basic info plus total likes
     // We'll group by v.id, then do a COUNT(*) from video_likes
     const result = await pool.query(
       `
@@ -86,13 +92,14 @@ exports.getAllVideos = async (req, res) => {
       GROUP BY v.id, u.id
       ORDER BY RANDOM()
       LIMIT $1
+      OFFSET $2                                              -- ← added
       `,
-      [limit]
+      [limit, offset]                                         // ← changed
     );
 
     let videos = result.rows; // each row has v.*, u.*, plus likes_count
 
-    // 2) if userId is present, figure out which videos this user liked
+        // 2) if userId is present, figure out which videos this user liked
     if (userId) {
       const likedResult = await pool.query(
         `SELECT video_id FROM video_likes WHERE user_id = $1`,
@@ -100,13 +107,13 @@ exports.getAllVideos = async (req, res) => {
       );
       const likedVideoIds = new Set(likedResult.rows.map((r) => r.video_id));
 
-      // 3) merge isLiked into each video
+           // 3) merge isLiked into each video
       videos = videos.map((vid) => ({
         ...vid,
         isliked: likedVideoIds.has(parseInt(vid.id, 10)),
       }));
     } else {
-      // not logged in => isliked = false
+            // not logged in => isliked = false
       videos = videos.map((vid) => ({ ...vid, isliked: false }));
     }
 
@@ -132,6 +139,15 @@ exports.getUserVideos = async (req, res) => {
 
   const { userId } = req.params;
   const viewerId = req.userId;
+  const cacheKey = `userVideos:${userId}`;
+
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    console.log(`getUserVideos: serving user ${userId} from cache`);
+    return res.json(cached);
+  }
+
+  console.time("getUserVideos_db");
 
   try {
     const userCheck = await pool.query("SELECT id FROM users WHERE id = $1", [
@@ -160,7 +176,7 @@ exports.getUserVideos = async (req, res) => {
       `,
       [userId]
     );
-
+    console.timeEnd("getUserVideos_db");
     let videos = videosResult.rows;
 
     // add isliked
@@ -184,7 +200,7 @@ exports.getUserVideos = async (req, res) => {
         comment_count: parseInt(vid.comment_count, 10),
       }));
     }
-
+    cache.set(cacheKey, videos);
     res.json(videos);
   } catch (err) {
     console.error("Error fetching user videos:", err);
@@ -196,6 +212,15 @@ exports.getFollowingVideos = async (req, res) => {
   const userId = req.userId; // set by authMiddleware
   const limit = parseInt(req.query.limit) || 10;
   const offset = parseInt(req.query.offset) || 0;
+  const cacheKey = `followingVideos:${userId}:${limit}:${offset}`;
+
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    console.log(`getFollowingVideos: serving from cache for user ${userId}`);
+    return res.json(cached);
+  }
+
+  console.time("getFollowingVideos_db");
 
   try {
     // 1) Fetch videos from users this user follows
@@ -223,6 +248,7 @@ exports.getFollowingVideos = async (req, res) => {
       [userId, limit, offset]
     );
 
+    console.timeEnd("getFollowingVideos_db");
     let videos = result.rows;
 
     // 2) Annotate with isliked
@@ -239,7 +265,7 @@ exports.getFollowingVideos = async (req, res) => {
         comment_count: parseInt(v.comment_count, 10),
       }));
     }
-
+    cache.set(cacheKey, videos);
     res.json(videos);
   } catch (err) {
     console.error("Error in getFollowingVideos:", err);

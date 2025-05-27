@@ -502,8 +502,20 @@ function Profile() {
                   setModalOpen(true);
                 }}
               >
-                <img
-                  src={thumbail} // middlertidig løsning
+                {/*endret tilbake fra middlertidg endring 
+                       <img
+                  src={thumbail} 
+                  muted
+                  playsInline
+                  preload="metadata"
+                  className="profile-video"
+                  alt="thumbnail"
+                />
+                med den orginale versjonen laster dere hele video elementet 
+                hens. alternativ løsning for en evnetuell automatisert thumbnail generering ved opplasting av video
+                */}
+                <video
+                  src={video.url} 
                   muted
                   playsInline
                   preload="metadata"
