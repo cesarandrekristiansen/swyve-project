@@ -1,47 +1,83 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { resetPassword } from "../services/passwordService";
-import "./passwordReset.css"
+import { passwordRules, passwordStrength } from "../securityCheck/validation";
+import "./passwordReset.css";
 
 export default function ResetPassword() {
-  const [newPass, setNewPass] = useState("");
-  const [msg, setMsg] = useState(null);
   const navigate = useNavigate();
   const params = new URLSearchParams(useLocation().search);
-  const token = params.get("token"); 
+  const token = params.get("token");
+
+  const [newPass, setNewPass] = useState("");
+  const [rules, setRules] = useState(passwordRules(""));
+  const [strength, setStrength] = useState(0);
+  const [msg, setMsg] = useState({ text: "", error: false });
 
   useEffect(() => {
-    if (!token) {
-      setMsg("Token missing");
-    }
-  }, [token]);
+    setRules(passwordRules(newPass));
+    setStrength(passwordStrength(newPass));
+  }, [newPass]);
+
+  const allPass = Object.values(rules).every(Boolean);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!allPass) {
+      setMsg({ text: "Password does not meet all requirements.", error: true });
+      return;
+    }
     try {
       await resetPassword(token, newPass);
-      setMsg("Password changed! Now Redirecting to login...");
-      setTimeout(() => navigate("/"), 2000);
+      setMsg({ text: "Password updated! Redirecting…", error: false });
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setMsg(err.message);
+      setMsg({ text: err.message, error: true });
     }
   };
+  const strengthLabels = ["Very Weak","Weak","Fair","Good","Strong"];
 
   return (
-    <div className="forgot-password-container">
+    <form onSubmit={handleSubmit} className="reset-password-form" noValidate>
       <h2>Reset Password</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="password"
-          placeholder="New Password"
-          value={newPass}
-          onChange={(e) => setNewPass(e.target.value)}
-          minLength={6}
-          required
-        />
-        <button type="submit">Comfirm</button>
-      </form>
-      {msg && <p className="status-msg">{msg}</p>}
-    </div>
+      <input
+        type="password"
+        placeholder="New password"
+        value={newPass}
+        onChange={(e) => setNewPass(e.target.value)}
+        className={msg.error && !allPass ? "input-error" : ""}
+        required
+      />
+
+      <div className="password-requirements">
+        <ul>
+          <li className={rules.length ? "ok" : "fail"}>
+            ≥ 8 characters
+          </li>
+          <li className={rules.upper ? "ok" : "fail"}>
+            Uppercase letter
+          </li>
+          <li className={rules.lower ? "ok" : "fail"}>
+            Lowercase letter
+          </li>
+          <li className={rules.digit ? "ok" : "fail"}>
+            Digit
+          </li>
+          <li className={rules.symbol ? "ok" : "fail"}>
+            Symbol
+          </li>
+        </ul>
+        <p>
+          Strength: <strong>{strengthLabels[strength]}</strong>
+        </p>
+      </div>
+
+      {msg.text && (
+        <p className={msg.error ? "error-msg" : "success-msg"}>{msg.text}</p>
+      )}
+      <button type="submit" disabled={!allPass}>
+        Confirm Password
+      </button>
+    </form>
   );
 }

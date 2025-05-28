@@ -16,7 +16,6 @@ export default function VideoFeed({
   showTabs = false,
 }) {
   const isControlled = Array.isArray(controlledVideos);
-  const [loading, setLoading] = useState(false);
   const [selectedTab, setSelectedTab] = useState("for-you");
   
 //hook based on tabs
@@ -70,7 +69,7 @@ export default function VideoFeed({
 
   return (
     <div className="video-feed-background">
-      {isFetching && !isFetchingNextPage && loading && <Loading />}
+      {isFetching && !isFetchingNextPage  && <Loading />}
 
       {showTabs && (
         <div className="feed-tabs">
@@ -97,6 +96,7 @@ export default function VideoFeed({
       <List
         className="video-feed-container-feed"
         height={window.innerHeight}
+        role="list"
         width="100%"
         itemCount={itemCount}
         itemSize={window.innerHeight}
@@ -119,7 +119,7 @@ export default function VideoFeed({
                     if (!isControlled && index === allVideos.length) {
                       return (
                         <div style={style} className="loading-item">
-                          {loading ? "Loading…" : ""}
+                          {Loading ? "Loading…" : ""}
                         </div>
                       );
                     }

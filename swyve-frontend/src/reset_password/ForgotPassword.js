@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { sendResetEmail } from "../services/passwordService"
-import "./passwordReset.css"
+import { sendResetEmail } from "../services/passwordService";
+import { validateEmail } from "../securityCheck/validation";
+import "./passwordReset.css"; 
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -9,10 +10,16 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ message: "", error: false });
+
+    if (!validateEmail(email)) {
+      setStatus({ message: "Please enter a valid email address.", error: true });
+      return;
+    }
+
     try {
       await sendResetEmail(email);
       setStatus({
-        message: "Check email for reset mail!",
+        message: "Check your inbox for a reset link!",
         error: false,
       });
     } catch (err) {
@@ -23,23 +30,21 @@ export default function ForgotPassword() {
   return (
     <div className="forgot-password-container">
       <h2>Forgot Password?</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email</label>
+      <form onSubmit={handleSubmit} noValidate>
         <input
-          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@eemail.com"
+          placeholder="you@example.com"
+          className={status.error ? "input-error" : ""}
           required
         />
-        <button type="submit">Send link</button>
+        {status.error && <p className="error-msg">{status.message}</p>}
+        <button type="submit">Send reset link</button>
+        {!status.error && status.message && (
+          <p className="success-msg">{status.message}</p>
+        )}
       </form>
-      {status.message && (
-        <p className={status.error ? "error-msg" : "success-msg"}>
-          {status.message}
-        </p>
-      )}
     </div>
   );
 }

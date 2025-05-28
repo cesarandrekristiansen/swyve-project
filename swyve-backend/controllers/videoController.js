@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 const supabase = require("../services/supabaseService");
 const pool = require("../db/pool");
 const NodeCache = require("node-cache");
-const cache = new NodeCache({ stdTTL: 120, checkperiod: 180 });
+const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
 
 exports.uploadVideo = async (req, res) => {
   console.log("uploadVideo controller is loaded!");
@@ -69,7 +69,14 @@ exports.saveMetadata = async (req, res) => {
 exports.getAllVideos = async (req, res) => {
   const userId = req.userId; // might be undefined if not logged in
   const limit = parseInt(req.query.limit) || 10;
-  const offset = parseInt(req.query.offset) || 0;            // ← new
+  const offset = parseInt(req.query.offset) || 0;  
+
+  const cacheKey = `allVideos:${limit}:${offset}`;
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    console.log("getAllVideos: serving from cache");
+    return res.json(cached);
+  }       
 
   try {
         // 1) fetch basic info plus total likes
@@ -92,9 +99,9 @@ exports.getAllVideos = async (req, res) => {
       GROUP BY v.id, u.id
       ORDER BY RANDOM()
       LIMIT $1
-      OFFSET $2                                              -- ← added
+      OFFSET $2                                              
       `,
-      [limit, offset]                                         // ← changed
+      [limit, offset]                                         
     );
 
     let videos = result.rows; // each row has v.*, u.*, plus likes_count
@@ -123,7 +130,7 @@ exports.getAllVideos = async (req, res) => {
       likes_count: parseInt(vid.likes_count, 10),
       comment_count: parseInt(vid.comment_count, 10),
     }));
-
+    cache.set(cacheKey, videos);
     res.json(videos);
   } catch (err) {
     console.error("Error in getAllVideos:", err);
