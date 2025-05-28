@@ -30,16 +30,19 @@ export default function ResetPassword() {
     try {
       await resetPassword(token, newPass);
       setMsg({ text: "Password updated! Redirecting…", error: false });
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
       setMsg({ text: err.message, error: true });
     }
   };
-  const strengthLabels = ["Very Weak","Weak","Fair","Good","Strong"];
+
+  const strengthLabels = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
 
   return (
-    <form onSubmit={handleSubmit} className="reset-password-form" noValidate>
+    <div className="page-wrapper">
+    <form onSubmit={handleSubmit} className="reset-container" noValidate>
       <h2>Reset Password</h2>
+
       <input
         type="password"
         placeholder="New password"
@@ -50,34 +53,33 @@ export default function ResetPassword() {
       />
 
       <div className="password-requirements">
+        <p>All requirements needs to be included</p>
         <ul>
-          <li className={rules.length ? "ok" : "fail"}>
-            ≥ 8 characters
-          </li>
-          <li className={rules.upper ? "ok" : "fail"}>
-            Uppercase letter
-          </li>
-          <li className={rules.lower ? "ok" : "fail"}>
-            Lowercase letter
-          </li>
-          <li className={rules.digit ? "ok" : "fail"}>
-            Digit
-          </li>
-          <li className={rules.symbol ? "ok" : "fail"}>
-            Symbol
-          </li>
+          <li className={rules.length ? "ok" : "fail"}>≥ 8 characters</li>
+          <li className={rules.upper ? "ok" : "fail"}>Uppercase letter</li>
+          <li className={rules.lower ? "ok" : "fail"}>Lowercase letter</li>
+          <li className={rules.digit ? "ok" : "fail"}>Digit</li>
+          <li className={rules.symbol ? "ok" : "fail"}>Symbol</li>
         </ul>
-        <p>
-          Strength: <strong>{strengthLabels[strength]}</strong>
-        </p>
+
+        <div className="strength-meter">
+          <div
+            className="strength-meter__bar"
+            data-score={strength}
+            style={{ width: `${(strength + 1) * 20}%` }}
+          />
+        </div>
+        <p className="strength-label">{strengthLabels[strength]}</p>
       </div>
 
       {msg.text && (
         <p className={msg.error ? "error-msg" : "success-msg"}>{msg.text}</p>
       )}
+
       <button type="submit" disabled={!allPass}>
         Confirm Password
       </button>
     </form>
+    </div>
   );
 }

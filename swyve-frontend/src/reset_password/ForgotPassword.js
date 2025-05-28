@@ -29,8 +29,9 @@ export default function ForgotPassword() {
 
   return (
     <div className="forgot-password-container">
-      <h2>Forgot Password?</h2>
       <form onSubmit={handleSubmit} noValidate>
+      <h2>Forgot Password?</h2>
+      <p>Insert the email you used when you created your account with us.</p>
         <input
           type="email"
           value={email}
