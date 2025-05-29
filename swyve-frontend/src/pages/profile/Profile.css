@@ -248,3 +248,49 @@
   cursor: pointer;
   z-index: 10;
 }
+
+.manage-toggle-btn {
+  background: #ff5a5f;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.video-thumb-wrapper {
+  position: relative;
+}
+
+.video-select-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.manage-bar {
+  position: fixed;
+  bottom: var(--bottom-nav-height);
+  left: 0;
+  right: 0;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.delete-selected-btn {
+  background: #ff5a5f;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}

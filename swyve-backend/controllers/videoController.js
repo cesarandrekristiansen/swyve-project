@@ -246,3 +246,36 @@ exports.getFollowingVideos = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.deleteVideo = async (req, res) => {
+  const userId = req.userId;
+  const videoId = req.params.id;
+
+  // 1) fetch the video record
+  const { rows } = await pool.query(
+    "SELECT url, user_id FROM videos WHERE id = $1",
+    [videoId]
+  );
+  if (!rows.length) return res.status(404).json({ error: "Video not found" });
+
+  const video = rows[0];
+  if (video.user_id !== userId) {
+    return res.status(403).json({ error: "Not your video" });
+  }
+
+  // 2) remove the file from Supabase storage
+  //    assumes your URLs look like https://xxx.supabase.co/storage/v1/object/public/videos/<path>
+  const [, filePath] = video.url.split("/videos/");
+  if (filePath) {
+    const { error: storageErr } = await supabase.storage
+      .from("videos")
+      .remove([filePath]);
+    if (storageErr) console.error("Storage delete failed:", storageErr);
+  }
+
+  // 3) delete the DB row (will cascade likes, playlists, etc)
+  await pool.query("DELETE FROM videos WHERE id = $1", [videoId]);
+
+  // 4) done
+  return res.status(204).end();
+};
