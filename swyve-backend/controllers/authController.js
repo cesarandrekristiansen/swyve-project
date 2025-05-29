@@ -26,20 +26,20 @@ exports.register = async (req, res) => {
     );
 
     try {
-       await Mailchimp.lists.addListMember(
-          process.env.MAILCHIMP_LIST_ID,
-          {
-            email_address: email,
-            status: "subscribed",
-            merge_fields: { FNAME: username }
-          },
-          { skipMergeValidation: true } 
-        );
-        console.log("Mailchimp: Bruker lagt til i lista (med skip_merge_validation)");        
-    }
-   catch (mcErr) {
+      await Mailchimp.lists.addListMember(
+        process.env.MAILCHIMP_LIST_ID,
+        {
+          email_address: email,
+          status: "subscribed",
+          merge_fields: { FNAME: username },
+        },
+        { skipMergeValidation: true }
+      );
+      console.log(
+        "Mailchimp: Bruker lagt til i lista (med skip_merge_validation)"
+      );
+    } catch (mcErr) {
       console.error("Mailchimp-feil:", mcErr);
-
     }
 
     res

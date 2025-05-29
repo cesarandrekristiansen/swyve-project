@@ -8,6 +8,7 @@ import ProfileFeedModal from "./ProfileFeedModal";
 import thumbail from "../../logo.png";
 import { Helmet } from "react-helmet";
 import Loading from "../../components/loading/Loading";
+import ConfirmModal from "./ConfirmModal";
 
 function Profile() {
   const navigate = useNavigate();
@@ -27,10 +28,24 @@ function Profile() {
   const [startIndex, setStartIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // State for managing video deletion
+  const [isManaging, setIsManaging] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const [editingUsername, setEditingUsername] = useState(false);
   const [tempUsername, setTempUsername] = useState("");
   const [editingBio, setEditingBio] = useState(false);
   const [tempBio, setTempBio] = useState("");
+
+  useEffect(() => {
+    // whenever the user switches tabs away from "uploaded",
+    // automatically exit manage-mode and clear selection
+    if (activeTab !== "uploaded") {
+      setIsManaging(false);
+      setSelectedIds([]);
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     if (!profileId) return;
@@ -291,13 +306,16 @@ function Profile() {
               property="og:title"
               content={`${profileData.username} on Swyve`}
             />
-       {/*her kan dere legge til profildata.bio om det skal være ønskelig*/}
+            {/*her kan dere legge til profildata.bio om det skal være ønskelig*/}
             <meta
               property="og:description"
               content={"Check out this creator on Swyve!"}
             />
-                 {/*her kan dere legge til profildata.cover_pic_url om det skal være ønskelig*/}
-            <meta property="og:image" content={"https://swyve.io/images/logoShare.png"} />
+            {/*her kan dere legge til profildata.cover_pic_url om det skal være ønskelig*/}
+            <meta
+              property="og:image"
+              content={"https://swyve.io/images/logoShare.png"}
+            />
             <meta
               property="og:url"
               content={`${process.env.REACT_APP_SHARE_URL}/profile/${profileData.id}`}
@@ -488,21 +506,47 @@ function Profile() {
               </a>
             </div>
           )}
-
+          {isMyProfile && activeTab === "uploaded" && (
+            <button
+              className="manage-toggle-btn"
+              onClick={() => {
+                setIsManaging(!isManaging);
+                setSelectedIds([]);
+              }}
+            >
+              {isManaging ? "Cancel" : "Manage Videos"}
+            </button>
+          )}
           <div className="video-gallery">
             {(activeTab === "liked" && isMyProfile
               ? likedVideos
               : userVideos
             ).map((video, index) => (
-              <div
-                className="video-thumb"
-                key={video.id}
-                onClick={() => {
-                  setStartIndex(index);
-                  setModalOpen(true);
-                }}
-              >
-                {/*endret tilbake fra middlertidg endring 
+              <div className="video-thumb-wrapper" key={video.id}>
+                {isManaging && (
+                  <input
+                    type="checkbox"
+                    className="video-select-checkbox"
+                    checked={selectedIds.includes(video.id)}
+                    onChange={(e) => {
+                      setSelectedIds((ids) =>
+                        e.target.checked
+                          ? [...ids, video.id]
+                          : ids.filter((id) => id !== video.id)
+                      );
+                    }}
+                  />
+                )}
+                <div
+                  className="video-thumb"
+                  onClick={() => {
+                    if (!isManaging) {
+                      setStartIndex(index);
+                      setModalOpen(true);
+                    }
+                  }}
+                >
+       {/*endret tilbake fra middlertidg endring 
                        <img
                   src={thumbail} 
                   muted
@@ -516,16 +560,60 @@ function Profile() {
                 */}
                 <video
                   src={video.url} 
-                  muted
-                  playsInline
-                  preload="metadata"
-                  className="profile-video"
-                  alt="thumbnail"
-                />
+                    muted
+                    playsInline
+                    preload="metadata"
+                    className="profile-video"
+                    alt="thumbnail"
+                  />
+                </div>
               </div>
             ))}
           </div>
         </>
+      )}
+
+      {isManaging && (
+        <div className="manage-bar">
+          <span>{selectedIds.length} selected</span>
+          <button
+            className="delete-selected-btn"
+            disabled={!selectedIds.length}
+            onClick={() => setShowConfirm(true)}
+          >
+            Delete
+          </button>
+        </div>
+      )}
+
+      {showConfirm && (
+        <ConfirmModal
+          message={`Delete ${selectedIds.length} video${
+            selectedIds.length > 1 ? "s" : ""
+          }? This cannot be undone.`}
+          onCancel={() => setShowConfirm(false)}
+          onConfirm={async () => {
+            // 1) Optimistic: remove from UI
+            setUserVideos((vs) =>
+              vs.filter((v) => !selectedIds.includes(v.id))
+            );
+            setIsManaging(false);
+            setShowConfirm(false);
+
+            // 2) Fire off deletes in parallel
+            await Promise.all(
+              selectedIds.map((vid) =>
+                fetch(`${process.env.REACT_APP_BASE_URL}/api/videos/${vid}`, {
+                  method: "DELETE",
+                  credentials: "include",
+                })
+              )
+            );
+
+            // 3) Clear selection
+            setSelectedIds([]);
+          }}
+        />
       )}
 
       {/* MODAL FEED VIEWER */}

@@ -6,6 +6,7 @@ const {
   getAllVideos,
   getUserVideos,
   getFollowingVideos,
+  deleteVideo,
 } = require("../controllers/videoController");
 
 const router = express.Router();
@@ -39,6 +40,10 @@ router.get(
   getUserVideos
 );
 
+// Get videos from users you follow
 router.get("/api/videos/following", authMiddleware, getFollowingVideos);
+
+// Delete video
+router.delete("/api/videos/:id", authMiddleware, deleteVideo);
 
 module.exports = router;
