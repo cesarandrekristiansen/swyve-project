@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { sendResetEmail } from "../services/passwordService";
 import { validateEmail } from "../securityCheck/validation";
-import "./passwordReset.css"; 
+import "./passwordReset.css";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -12,7 +12,10 @@ export default function ForgotPassword() {
     setStatus({ message: "", error: false });
 
     if (!validateEmail(email)) {
-      setStatus({ message: "Please enter a valid email address.", error: true });
+      setStatus({
+        message: "Please enter a valid email address.",
+        error: true,
+      });
       return;
     }
 
@@ -28,24 +31,42 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="forgot-password-container">
-      <form onSubmit={handleSubmit} noValidate>
-      <h2>Forgot Password?</h2>
-      <p>Insert the email you used when you created your account with us.</p>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className={status.error ? "input-error" : ""}
-          required
-        />
-        {status.error && <p className="error-msg">{status.message}</p>}
-        <button type="submit">Send reset link</button>
-        {!status.error && status.message && (
-          <p className="success-msg">{status.message}</p>
-        )}
-      </form>
+    <div className="forgot-container">
+      {/* Left side: logo + branding */}
+      <div className="forgot-left">
+        <div className="brand-section">
+          <div className="logo-title-row">
+            <img
+              src="/images/logo.png"
+              alt="Swyve Logo"
+              className="splash-logo"
+            />
+            <h1>SWYVE</h1>
+          </div>
+          <h2>Reset your password</h2>
+        </div>
+      </div>
+
+      {/* Right side: reset form */}
+      <div className="forgot-right">
+        <form className="reset-form" onSubmit={handleSubmit} noValidate>
+          <h2>Forgot Password?</h2>
+          <p>Enter the email you used when you created your account.</p>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={status.error ? "input-error" : ""}
+            required
+          />
+          {status.error && <p className="error-msg">{status.message}</p>}
+          <button type="submit">Send reset link</button>
+          {!status.error && status.message && (
+            <p className="success-msg">{status.message}</p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
