@@ -1,5 +1,5 @@
 import React from "react";
-import VideoFeed from "../../components/videofeed/VideoFeed";
+import VideoFeed from "../../../../components/videofeed/VideoFeed";
 
 export default function ProfileFeedModal({ videos, startIndex, onClose }) {
   return (

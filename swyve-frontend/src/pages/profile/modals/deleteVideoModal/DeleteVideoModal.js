@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./ConfirmModal.css";
+import "./DeleteVideoModal.css";
 
-export default function ConfirmModal({ message, onCancel, onConfirm }) {
+export default function DeleteVideoModal({ message, onCancel, onConfirm }) {
   return ReactDOM.createPortal(
     <div className="confirm-backdrop">
       <div className="confirm-modal">
