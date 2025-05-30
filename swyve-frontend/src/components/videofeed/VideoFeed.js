@@ -5,29 +5,6 @@ import VideoCard from "../videocard/VideoCard";
 import Loading from "../../components/loading/Loading";
 import "./VideoFeed.css";
 
-const SCROLL_THRESHOLD_PX = 600;
-
-function useViewportHeight() {
-  const getVH = () =>
-    window.visualViewport?.height ?? window.innerHeight;
-
-  const [vh, setVh] = useState(getVH());
-
-  useEffect(() => {
-    const onResize = () => setVh(getVH());
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", onResize);
-      return () =>
-        window.visualViewport.removeEventListener("resize", onResize);
-    } else {
-      window.addEventListener("resize", onResize);
-      return () => window.removeEventListener("resize", onResize);
-    }
-  }, []);
-
-  return vh;
-}
-
 export default function VideoFeed({
   videos: controlledVideos,
   hasMore: hasMoreProp = false,
@@ -38,9 +15,8 @@ export default function VideoFeed({
 }) {
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
-  const vh = useViewportHeight();
 
-  // hook based on tabs
+  // pick your endpoint
   const type = selectedTab === "following" ? "following" : "all";
 
   const {
@@ -58,14 +34,13 @@ export default function VideoFeed({
   const listRef = useRef();
   const outerRef = useRef();
 
-  // scroll to the right spot on mount
   useEffect(() => {
     if (listRef.current && startIndex > 0) {
       listRef.current.scrollToItem(startIndex, "start");
     }
   }, [startIndex]);
 
-  // Infinite‐scroll threshold handler
+  {/*// Infinite‐scroll threshold handler
   const handleScroll = useCallback(() => {
     const el = outerRef.current;
     if (
@@ -88,11 +63,13 @@ export default function VideoFeed({
     onLoadMore,
   ]);
 
-  const itemCount = allVideos.length;
+  const itemCount = allVideos.length;*/}
+
+  const itemCount = allVideos.length + (hasMore ? 1 : 0);
 
   return (
     <div className="video-feed-background">
-      {isFetching && !isFetchingNextPage  && <Loading />}
+      {isFetching && !isFetchingNextPage && <Loading />}
 
       {showTabs && (
         <div className="feed-tabs">
@@ -119,28 +96,33 @@ export default function VideoFeed({
 
       <List
         className="video-feed-container-feed"
-        height={vh}
+        height={window.innerHeight}
         width="100%"
         role="list"
         itemCount={itemCount}
-        itemSize={vh}
+        itemSize={window.innerHeight}
         overscanCount={2}
         ref={listRef}
         outerRef={outerRef}
-        onScroll={handleScroll}
         onItemsRendered={({ visibleStopIndex }) => {
           if (
-            visibleStopIndex >= allVideos.length - 1 &&
+            visibleStopIndex === allVideos.length && 
             hasMore &&
             !isFetchingNextPage
           ) {
-            isControlled ? onLoadMore?.() : fetchNextPage();
+            fetchNextPage();
           }
         }}
       >
         {({ index, style }) => {
+          if (index === allVideos.length) {
+            return (
+              <div style={style} className="loading-item">
+                {isFetchingNextPage ? Loading : ""}
+              </div>
+            );
+          }
           const video = allVideos[index];
-          if (!video) return null;
           return (
             <div style={style} className="video-feed-slide">
               <VideoCard video={video} />
