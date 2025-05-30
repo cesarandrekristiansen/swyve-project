@@ -17,6 +17,7 @@ export default function VideoFeed({
 }) {
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
+  const [vh, setVh] = useState(() => window.innerHeight);
   
 //hook based on tabs
   const type = selectedTab === "following" ? "following" : "all";
@@ -95,11 +96,11 @@ export default function VideoFeed({
 
       <List
         className="video-feed-container-feed"
-        height={window.innerHeight}
+        height={vh}
         role="list"
         width="100%"
         itemCount={itemCount}
-        itemSize={window.innerHeight}
+        itemSize={vh}
         overscanCount={2}
         ref={listRef}
         outerRef={outerRef}
