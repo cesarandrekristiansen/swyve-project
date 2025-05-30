@@ -119,7 +119,6 @@ function VideoCard({ video, onProfileClick }) {
         className="video-player"
         loop
         playsInline
-        controls
         preload="auto"
       />
       {paused && (
