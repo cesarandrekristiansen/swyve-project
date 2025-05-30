@@ -161,14 +161,13 @@ function VideoCard({ video, onProfileClick }) {
         </button>
       </div>
 
-     { /*<div className="video-overlay" onClick={handleProfileClick}>
+     <div className="video-overlay" onClick={handleProfileClick}>
         <span className="video-username">{username}</span>
         <span className="video-description">
           Hot girl etc description big ass Hot girl etc description big ass Hot
           girl
         </span>
       </div>
-        */}
     </div>
   );
 }
