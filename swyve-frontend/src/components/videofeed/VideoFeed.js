@@ -5,7 +5,28 @@ import VideoCard from "../videocard/VideoCard";
 import Loading from "../../components/loading/Loading";
 import "./VideoFeed.css";
 
-const SCROLL_THRESHOLD_PX = 600;
+const SCROLL_THRESHOLD_PX = 700;
+
+function useViewportHeight() {
+  const getVH = () =>
+    window.visualViewport?.height ?? window.innerHeight;
+
+  const [vh, setVh] = useState(getVH());
+
+  useEffect(() => {
+    const onResize = () => setVh(getVH());
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onResize);
+      return () =>
+        window.visualViewport.removeEventListener("resize", onResize);
+    } else {
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
+    }
+  }, []);
+
+  return vh;
+}
 
 export default function VideoFeed({
   videos: controlledVideos,
@@ -17,10 +38,7 @@ export default function VideoFeed({
 }) {
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
-  const [vh, setVh] = useState(0);
-  useEffect(() => {
-    setVh(window.innerHeight);
-  }, []);
+  const vh = useViewportHeight();
   
 //hook based on tabs
   const type = selectedTab === "following" ? "following" : "all";
