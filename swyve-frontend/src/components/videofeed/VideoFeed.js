@@ -5,7 +5,7 @@ import VideoCard from "../videocard/VideoCard";
 import Loading from "../../components/loading/Loading";
 import "./VideoFeed.css";
 
-const SCROLL_THRESHOLD_PX = 700;
+const SCROLL_THRESHOLD_PX = 600;
 
 function useViewportHeight() {
   const getVH = () =>
@@ -39,8 +39,8 @@ export default function VideoFeed({
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
   const vh = useViewportHeight();
-  
-//hook based on tabs
+
+  // hook based on tabs
   const type = selectedTab === "following" ? "following" : "all";
 
   const {
@@ -58,7 +58,7 @@ export default function VideoFeed({
   const listRef = useRef();
   const outerRef = useRef();
 
-
+  // scroll to the right spot on mount
   useEffect(() => {
     if (listRef.current && startIndex > 0) {
       listRef.current.scrollToItem(startIndex, "start");
@@ -74,6 +74,7 @@ export default function VideoFeed({
       !(isControlled ? hasMoreProp : hasNextPage)
     )
       return;
+
     const { scrollTop, scrollHeight, clientHeight } = el;
     if (scrollHeight - (scrollTop + clientHeight) < SCROLL_THRESHOLD_PX) {
       isControlled ? onLoadMore?.() : fetchNextPage();
@@ -109,6 +110,7 @@ export default function VideoFeed({
           </button>
         </div>
       )}
+
       {onClose && (
         <button className="video-feed-close" onClick={onClose}>
           ✕
@@ -118,8 +120,8 @@ export default function VideoFeed({
       <List
         className="video-feed-container-feed"
         height={vh}
-        role="list"
         width="100%"
+        role="list"
         itemCount={itemCount}
         itemSize={vh}
         overscanCount={2}
@@ -127,7 +129,6 @@ export default function VideoFeed({
         outerRef={outerRef}
         onScroll={handleScroll}
         onItemsRendered={({ visibleStopIndex }) => {
-
           if (
             visibleStopIndex >= allVideos.length - 1 &&
             hasMore &&
@@ -138,13 +139,6 @@ export default function VideoFeed({
         }}
       >
         {({ index, style }) => {
-                    if (!isControlled && index === allVideos.length) {
-                      return (
-                        <div style={style} className="loading-item">
-                          {Loading ? "Loading…" : ""}
-                        </div>
-                      );
-                    }
           const video = allVideos[index];
           if (!video) return null;
           return (
