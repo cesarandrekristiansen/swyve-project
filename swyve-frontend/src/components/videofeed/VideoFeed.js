@@ -17,7 +17,10 @@ export default function VideoFeed({
 }) {
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
-  const [vh, setVh] = useState(() => window.innerHeight);
+  const [vh, setVh] = useState(0);
+  useEffect(() => {
+    setVh(window.innerHeight);
+  }, []);
   
 //hook based on tabs
   const type = selectedTab === "following" ? "following" : "all";
