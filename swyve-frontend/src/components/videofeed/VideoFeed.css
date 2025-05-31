@@ -24,14 +24,6 @@
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
 }
-@media (max-width: 768px) {
-  .video-feed-container-feed video{
-    height: 95dvh;
-  }
-  .video-feed-container-feed{
-    height: 95dvh;
-  }
-}
 
 /* Each full-screen slide */
 .video-feed-slide {
