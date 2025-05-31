@@ -20,14 +20,13 @@ async function fetchVideos({ pageParam = 0, queryKey }) {
   return res.json();
 }
 
-export function useVideos({ type = 'all', userId }) {
-  return useInfiniteQuery({
-    queryKey: ['videos', { type, userId }],
-    queryFn: fetchVideos,
-    getNextPageParam: (lastPage, allPages) => {
-        return lastPage.length === LIMIT
-          ? allPages.length * LIMIT
-          : undefined;
-      }
-  });
-}
+export function useVideos({ type = "all", userId }) {
+    return useInfiniteQuery({
+      queryKey: ["videos", type, userId],
+      queryFn: fetchVideos,
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.length < LIMIT ? undefined : allPages.length * LIMIT,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    });
+  }
