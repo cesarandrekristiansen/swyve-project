@@ -5,6 +5,8 @@ import VideoCard from "../videocard/VideoCard";
 import Loading from "../../components/loading/Loading";
 import "./VideoFeed.css";
 
+const SCROLL_THRESHOLD_PX = 100; 
+
 export default function VideoFeed({
   videos: controlledVideos,
   hasMore: hasMoreProp = false,
@@ -15,10 +17,9 @@ export default function VideoFeed({
 }) {
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
+  const [vh] = useState(window.innerHeight);
 
-  // pick your endpoint
   const type = selectedTab === "following" ? "following" : "all";
-
   const {
     data,
     fetchNextPage,
@@ -40,14 +41,9 @@ export default function VideoFeed({
     }
   }, [startIndex]);
 
-  {/*// Infinite‐scroll threshold handler
   const handleScroll = useCallback(() => {
     const el = outerRef.current;
-    if (
-      !el ||
-      isFetchingNextPage ||
-      !(isControlled ? hasMoreProp : hasNextPage)
-    )
+    if (!el || isFetchingNextPage || !(isControlled ? hasMoreProp : hasNextPage))
       return;
 
     const { scrollTop, scrollHeight, clientHeight } = el;
@@ -63,9 +59,7 @@ export default function VideoFeed({
     onLoadMore,
   ]);
 
-  const itemCount = allVideos.length;*/}
-
-  const itemCount = allVideos.length + (hasMore ? 1 : 0);
+  const itemCount = allVideos.length;
 
   return (
     <div className="video-feed-background">
@@ -96,33 +90,28 @@ export default function VideoFeed({
 
       <List
         className="video-feed-container-feed"
-        height={window.innerHeight}
+        height={vh}
         width="100%"
         role="list"
         itemCount={itemCount}
-        itemSize={window.innerHeight}
-       /// overscanCount={2}
+        itemSize={vh}
+        overscanCount={2}
         ref={listRef}
         outerRef={outerRef}
+        onScroll={handleScroll}
         onItemsRendered={({ visibleStopIndex }) => {
           if (
-            visibleStopIndex === allVideos.length && 
+            visibleStopIndex >= allVideos.length - 1 &&
             hasMore &&
             !isFetchingNextPage
           ) {
-            fetchNextPage();
+            isControlled ? onLoadMore?.() : fetchNextPage();
           }
         }}
       >
         {({ index, style }) => {
-          if (index === allVideos.length) {
-            return (
-              <div style={style} className="loading-item">
-                {isFetchingNextPage ? Loading : ""}
-              </div>
-            );
-          }
           const video = allVideos[index];
+          if (!video) return null;
           return (
             <div style={style} className="video-feed-slide">
               <VideoCard video={video} />
