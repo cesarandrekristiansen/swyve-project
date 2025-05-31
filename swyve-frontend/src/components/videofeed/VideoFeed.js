@@ -1,10 +1,9 @@
-import React, {  useRef, useEffect, useState, useCallback,} from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { FixedSizeList as List } from "react-window";
 import { useVideos } from "../../hooks/videoHooks";
 import VideoCard from "../videocard/VideoCard";
 import Loading from "../../components/loading/Loading";
 import "./VideoFeed.css";
-import { Helmet } from "react-helmet";
 
 const SCROLL_THRESHOLD_PX = 600;
 
@@ -14,9 +13,11 @@ function useDebouncedCallback(callback, delay) {
   const debouncedFn = useCallback(
     (...args) => {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current); }
+        clearTimeout(timeoutRef.current);
+      }
       timeoutRef.current = setTimeout(() => {
-        callback(...args);}, delay);
+        callback(...args);
+      }, delay);
     },
     [callback, delay]
   );
@@ -71,12 +72,6 @@ export default function VideoFeed({
     }
   }, [startIndex]);
 
-  const nextIndex =
-    allVideos.length > 0
-      ? (currentIndex + 1) % allVideos.length
-      : null;
-  const nextVideoUrl =
-    nextIndex !== null ? allVideos[nextIndex]?.url : null;
 
   const debouncedSnap = useDebouncedCallback((scrollOffset) => {
     if (!listRef.current) return;
@@ -117,17 +112,6 @@ export default function VideoFeed({
 
   return (
     <div className="video-feed-background">
-      <Helmet>
-        {nextVideoUrl && (
-          <link
-            rel="preload"
-            as="video"
-            href={nextVideoUrl}
-            type="video/mp4"
-          />
-        )}
-      </Helmet>
-
       {isFetching && !isFetchingNextPage && <Loading />}
 
       {showTabs && (
