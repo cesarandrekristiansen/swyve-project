@@ -27,6 +27,10 @@
 
 /* Each full-screen slide */
 .video-feed-slide {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   width: 100%;
   height: 100dvh;
   scroll-snap-align: start;
