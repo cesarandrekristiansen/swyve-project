@@ -1,7 +1,6 @@
 /* src/components/videocard/VideoCard.css */
-
-/* Each slide wrapper: fill viewport, crop overflow */
 /*
+/* Each slide wrapper: fill viewport, crop overflow */
 .video-card {
   position: relative;
   width: 100%;
@@ -10,30 +9,32 @@
 }
 
 /* Video truly fills & crops: center it, then min-size to cover */
-/*.video-player {
+.video-player {
   position: absolute;
   top: 50%;
   left: 50%;
   min-width: 100%;
   min-height: 100%;
   transform: translate(-50%, -50%);
-}*/
-.video-card {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  position: relative;
 }
-
-.video-player {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  object-fit: cover;       /* eller contain, etter behov */
-  display: block;          /* fjerner inline‐gap */
+@media (max-with: 768px) {
+  .video-card {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .video-player {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    object-fit: cover; 
+    display: block;
+  }
 }
 /* Username at bottom-left */
 .video-overlay {
