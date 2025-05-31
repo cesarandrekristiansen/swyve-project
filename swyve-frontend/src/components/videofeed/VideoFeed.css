@@ -21,7 +21,6 @@
   width: 100vw;
   height: 100dvh;
   overflow-y: scroll;
- /* scroll-snap-type: y mandatory;*/
   scroll-behavior: smooth;
 }
 
@@ -29,9 +28,8 @@
 .video-feed-slide {
   width: 100vw;
   height: 100dvh;
-  /*scroll-snap-align: center;*/
 }
-@media (max-with: 768px) {
+@media (max-width: 768px) {
 .video-feed-slide {
   box-sizing: border-box;
   margin: 0;
