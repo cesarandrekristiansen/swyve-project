@@ -1,14 +1,14 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { IoMdHeart, IoIosSave } from "react-icons/io";
+import { IoMdHeart, IoIosSave  } from "react-icons/io";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
-import { FaShare, FaPlay } from "react-icons/fa";
+import { FaShare, FaPlay, FaVolumeUp, } from "react-icons/fa";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CommentModal from "../comment/CommentModal";
 import "./VideoCard.css";
 
-function VideoCard({ video, onProfileClick, muted }) {
+function VideoCard({video, onProfileClick }) {
   const {
     id,
     url,
@@ -19,7 +19,6 @@ function VideoCard({ video, onProfileClick, muted }) {
     comment_count,
     user_id,
   } = video;
-  
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -30,45 +29,73 @@ function VideoCard({ video, onProfileClick, muted }) {
   );
   const [showComments, setShowComments] = useState(false);
 
-
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
 
   const [paused, setPaused] = useState(true);
-  // Auto-play/pause
-  useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
-    if (inView) {
-      vid.muted = false
+  const [unmutedByUser, setUnmutedByUser] = useState(false);
 
+  useEffect(() => {
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
+    vidEl.muted = true;
+    if (inView) {
+      vidEl
+        .play()
+        .catch((err) => {
+          console.debug("Muted autoplay err", err);
+        });
     } else {
-      vid.muted = true
+      vidEl.pause();
     }
   }, [inView]);
 
   useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
     const onPlay = () => setPaused(false);
     const onPause = () => setPaused(true);
-    vid.addEventListener("play", onPlay);
-    vid.addEventListener("pause", onPause);
+    vidEl.addEventListener("play", onPlay);
+    vidEl.addEventListener("pause", onPause);
     return () => {
-      vid.removeEventListener("play", onPlay);
-      vid.removeEventListener("pause", onPause);
+      vidEl.removeEventListener("play", onPlay);
+      vidEl.removeEventListener("pause", onPause);
     };
   }, []);
 
-  const handlePlay = () => {
-    const vid = videoRef.current;
-    if (vid) vid.play();
+  const handlePlayClick = () => {
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
+
+    if (unmutedByUser) {
+      vidEl.muted = false;
+    }
+
+    vidEl
+      .play()
+      .catch((err) => {
+        console.warn("paused", err);
+      });
+  };
+
+  const handleUnmuteClick = () => {
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
+    setUnmutedByUser(true);
+    vidEl
+      .play()
+      .then(() => {
+        vidEl.muted = false;
+      })
+      .catch((err) => {
+        console.warn("muted:", err);
+      });
   };
 
   function handleProfileClick() {
     if (onProfileClick) onProfileClick();
     navigate(`/profile/${user_id}`);
-  }
+  };
 
   async function toggleLike() {
     if (!user) {
@@ -108,12 +135,20 @@ function VideoCard({ video, onProfileClick, muted }) {
         className="video-player"
         loop
         playsInline
-autoPlay
+        autoPlay={false}
         preload="auto"
       />
+
+<div className="unmute">
+            { inView &&(
+        <button className="video-unmute-button" onClick={handleUnmuteClick}>
+          <FaVolumeUp size={24} color="white" />
+        </button>
+      )}
+      </div>
       {paused && (
-        <div className="video-paused-overlay" onClick={handlePlay}>
-          <FaPlay />
+        <div className="video-paused-overlay" onClick={handlePlayClick}>
+          <FaPlay size={48} color="white" />
         </div>
       )}
 
@@ -151,10 +186,10 @@ autoPlay
         </button>
       </div>
 
-     <div className="video-overlay" onClick={handleProfileClick}>
-        <span className="video-username">{username}</span>
+      <div className="video-overlay" onClick={handleProfileClick}>
+        <span className="video-username">@{username}</span>
         <span className="video-description">
-          Hot girl etc description big ass Hot girl etc description big ass Hot
+        Hot girl etc description big ass Hot girl etc description big ass Hot
           girl
         </span>
       </div>
