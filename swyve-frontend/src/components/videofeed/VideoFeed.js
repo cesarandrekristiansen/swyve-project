@@ -101,7 +101,7 @@ export default function VideoFeed({
         role="list"
         itemCount={itemCount}
         itemSize={window.innerHeight}
-        overscanCount={2}
+       /// overscanCount={2}
         ref={listRef}
         outerRef={outerRef}
         onItemsRendered={({ visibleStopIndex }) => {
