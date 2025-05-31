@@ -24,6 +24,10 @@ export function useVideos({ type = 'all', userId }) {
   return useInfiniteQuery({
     queryKey: ['videos', { type, userId }],
     queryFn: fetchVideos,
-    getNextPageParam: (_lastPage, allPages) => allPages.length * LIMIT,
+    getNextPageParam: (lastPage, allPages) => {
+        return lastPage.length === LIMIT
+          ? allPages.length * LIMIT
+          : undefined;
+      }
   });
 }
