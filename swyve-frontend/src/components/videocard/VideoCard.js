@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import CommentModal from "../comment/CommentModal";
 import "./VideoCard.css";
 
-function VideoCard({ video, onProfileClick }) {
+function VideoCard({ video, onProfileClick, muted }) {
   const {
     id,
     url,
@@ -63,20 +63,7 @@ function VideoCard({ video, onProfileClick }) {
 
   const handlePlay = () => {
     const vid = videoRef.current;
-    if (!vid) return;
-    vid
-      .play()
-      .then(() => {
-        setShowControls(true);
-      })
-      .catch((err) => {
-        if (
-          err.name !== "AbortError" &&
-          err.name !== "NotAllowedError"
-        ) {
-          console.warn("Play aborted:", err);
-        }
-      });
+    if (vid) vid.play();
   };
 
   function handleProfileClick() {
@@ -122,9 +109,8 @@ function VideoCard({ video, onProfileClick }) {
         className="video-player"
         loop
         playsInline
-        controls={showControls}    
+        controls
         preload="auto"
-        onClick={handlePlay}
       />
       {paused && (
         <div className="video-paused-overlay" onClick={handlePlay}>
