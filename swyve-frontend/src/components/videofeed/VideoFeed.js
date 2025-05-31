@@ -1,11 +1,34 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect,  useState,  useCallback,} from "react";
 import { FixedSizeList as List } from "react-window";
 import { useVideos } from "../../hooks/videoHooks";
 import VideoCard from "../videocard/VideoCard";
 import Loading from "../../components/loading/Loading";
 import "./VideoFeed.css";
 
-const SCROLL_THRESHOLD_PX = 100; 
+const SCROLL_THRESHOLD_PX = 600;
+
+function useDebouncedCallback(callback, delay) {
+  const timeoutRef = useRef(null);
+
+  const debouncedFn = useCallback(
+    (...args) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current); }
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);}, delay);
+    },
+    [callback, delay]
+  );
+
+  useEffect(
+    () => () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);}
+    },[]
+  );
+
+  return debouncedFn;
+}
 
 export default function VideoFeed({
   videos: controlledVideos,
@@ -17,7 +40,6 @@ export default function VideoFeed({
 }) {
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
-  const [vh] = useState(window.innerHeight);
 
   const type = selectedTab === "following" ? "following" : "all";
   const {
@@ -32,20 +54,41 @@ export default function VideoFeed({
   const allVideos = isControlled ? controlledVideos : fetchedVideos;
   const hasMore = isControlled ? hasMoreProp : hasNextPage;
 
-  const listRef = useRef();
-  const outerRef = useRef();
+  const listRef = useRef(null);
+  const outerRef = useRef(null);
+
+  const itemSize = window.innerHeight;
 
   useEffect(() => {
     if (listRef.current && startIndex > 0) {
       listRef.current.scrollToItem(startIndex, "start");
     }
   }, [startIndex]);
+  const onScrollCallback = useCallback(
+    ({ scrollDirection, scrollUpdateWasRequested, scrollOffset }) => {
+      if (scrollUpdateWasRequested) {
+        return;
+      }
+      debouncedSnap(scrollOffset);
+    },
+    []
+  );
 
-  const handleScroll = useCallback(() => {
+  const debouncedSnap = useDebouncedCallback((scrollOffset) => {
+    if (!listRef.current) return;
+    const exactIndex = scrollOffset / itemSize;
+    const nearestIndex = Math.round(exactIndex);
+    listRef.current.scrollToItem(nearestIndex, "start");
+  }, 50);
+
+  const handleScrollThreshold = useCallback(() => {
     const el = outerRef.current;
-    if (!el || isFetchingNextPage || !(isControlled ? hasMoreProp : hasNextPage))
+    if (
+      !el ||
+      isFetchingNextPage ||
+      !(isControlled ? hasMoreProp : hasNextPage)
+    )
       return;
-
     const { scrollTop, scrollHeight, clientHeight } = el;
     if (scrollHeight - (scrollTop + clientHeight) < SCROLL_THRESHOLD_PX) {
       isControlled ? onLoadMore?.() : fetchNextPage();
@@ -58,6 +101,16 @@ export default function VideoFeed({
     hasNextPage,
     onLoadMore,
   ]);
+
+  const onScrollHandler = (e) => {
+    handleScrollThreshold();
+    const scrollOffset = outerRef.current?.scrollTop ?? 0;
+    onScrollCallback({
+      scrollOffset,
+      scrollDirection: null,
+      scrollUpdateWasRequested: false,
+    });
+  };
 
   const itemCount = allVideos.length;
 
@@ -81,7 +134,6 @@ export default function VideoFeed({
           </button>
         </div>
       )}
-
       {onClose && (
         <button className="video-feed-close" onClick={onClose}>
           ✕
@@ -90,15 +142,15 @@ export default function VideoFeed({
 
       <List
         className="video-feed-container-feed"
-        height={vh}
+        height={window.innerHeight}
         width="100%"
         role="list"
         itemCount={itemCount}
-        itemSize={vh}
+        itemSize={itemSize}
         overscanCount={2}
         ref={listRef}
         outerRef={outerRef}
-        onScroll={handleScroll}
+        onScroll={onScrollHandler}
         onItemsRendered={({ visibleStopIndex }) => {
           if (
             visibleStopIndex >= allVideos.length - 1 &&

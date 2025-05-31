@@ -27,13 +27,11 @@
 
 /* Each full-screen slide */
 .video-feed-slide {
-
-  width: 100%;
+  width: 100vw;
   height: 100dvh;
- /* scroll-snap-align: start;*/
+  /*scroll-snap-align: center;*/
 }
 @media (max-with: 768px) {
-  
 .video-feed-slide {
   box-sizing: border-box;
   margin: 0;
