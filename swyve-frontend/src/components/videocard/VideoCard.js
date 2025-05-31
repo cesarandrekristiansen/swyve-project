@@ -40,11 +40,13 @@ function VideoCard({ video, onProfileClick, muted }) {
     const vid = videoRef.current;
     if (!vid) return;
     if (inView) {
+      vid.muted = false
       vid.play().catch((err) => {
         console.warn("Autoplay prevented, user interaction required", err);
       });
     } else {
-      vid.pause();
+      vid.muted = true
+      vid.pause()
     }
   }, [inView]);
 
@@ -109,7 +111,7 @@ function VideoCard({ video, onProfileClick, muted }) {
         className="video-player"
         loop
         playsInline
-        controls
+autoPlay
         preload="auto"
       />
       {paused && (
