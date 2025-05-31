@@ -29,7 +29,7 @@ function VideoCard({ video, onProfileClick, muted }) {
     parseInt(comment_count, 10) || 0
   );
   const [showComments, setShowComments] = useState(false);
-  const [showControls, setShowControls] = useState(false);
+
 
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
@@ -41,12 +41,9 @@ function VideoCard({ video, onProfileClick, muted }) {
     if (!vid) return;
     if (inView) {
       vid.muted = false
-      vid.play().catch((err) => {
-        console.warn("Autoplay prevented, user interaction required", err);
-      });
+
     } else {
       vid.muted = true
-      vid.pause()
     }
   }, [inView]);
 
