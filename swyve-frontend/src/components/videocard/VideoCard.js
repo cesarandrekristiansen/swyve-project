@@ -20,17 +20,6 @@ function VideoCard({ video, onProfileClick }) {
     user_id,
   } = video;
   
-  // preload logikk
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as  = "video";
-    link.href = url;
-    document.head.appendChild(link);
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, [url]);
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -40,6 +29,7 @@ function VideoCard({ video, onProfileClick }) {
     parseInt(comment_count, 10) || 0
   );
   const [showComments, setShowComments] = useState(false);
+  const [showControls, setShowControls] = useState(false);
 
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
@@ -73,7 +63,20 @@ function VideoCard({ video, onProfileClick }) {
 
   const handlePlay = () => {
     const vid = videoRef.current;
-    if (vid) vid.play();
+    if (!vid) return;
+    vid
+      .play()
+      .then(() => {
+        setShowControls(true);
+      })
+      .catch((err) => {
+        if (
+          err.name !== "AbortError" &&
+          err.name !== "NotAllowedError"
+        ) {
+          console.warn("Play aborted:", err);
+        }
+      });
   };
 
   function handleProfileClick() {
@@ -119,8 +122,9 @@ function VideoCard({ video, onProfileClick }) {
         className="video-player"
         loop
         playsInline
-        controls
+        controls={showControls}    
         preload="auto"
+        onClick={handlePlay}
       />
       {paused && (
         <div className="video-paused-overlay" onClick={handlePlay}>
