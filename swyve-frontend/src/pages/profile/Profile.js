@@ -329,20 +329,19 @@ function Profile() {
               </div>
             ))}
           </div>
+          {isManaging && (
+            <div className="manage-bar">
+              <span>{selectedIds.length} selected</span>
+              <button
+                className="delete-selected-btn"
+                disabled={!selectedIds.length}
+                onClick={() => setShowConfirm(true)}
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </>
-      )}
-
-      {isManaging && (
-        <div className="manage-bar">
-          <span>{selectedIds.length} selected</span>
-          <button
-            className="delete-selected-btn"
-            disabled={!selectedIds.length}
-            onClick={() => setShowConfirm(true)}
-          >
-            Delete
-          </button>
-        </div>
       )}
 
       {showConfirm && (
