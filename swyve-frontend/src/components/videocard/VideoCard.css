@@ -22,7 +22,7 @@
   min-height: 100%;
   transform: translate(-50%, -50%);
 }
-@media (max-with: 768px) {
+@media (max-width: 768px) {
   .video-card {
     box-sizing: border-box;
     margin: 0;
