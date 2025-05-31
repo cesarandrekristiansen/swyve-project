@@ -139,3 +139,45 @@
   color: #fff;
   font-size: 50px;
 }
+
+/* ── TAG LIST STYLES ── */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.tag-item {
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: #6a0dad; /* fallback */
+}
+
+/* Cycle among your four theme colors */
+.tag-list .tag-item:nth-child(4n + 1) {
+  background: #ff4500;
+}
+.tag-list .tag-item:nth-child(4n + 2) {
+  background: #6a0dad;
+}
+.tag-list .tag-item:nth-child(4n + 3) {
+  background: #ff6347;
+}
+.tag-list .tag-item:nth-child(4n + 4) {
+  background: #4b0082;
+}
+
+/* Toggle button */
+.tag-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0 6px;
+  align-self: center;
+}

@@ -18,13 +18,14 @@ function VideoCard({ video, onProfileClick }) {
     likes_count,
     comment_count,
     user_id,
+    tags,
   } = video;
-  
+
   // preload logikk
   useEffect(() => {
     const link = document.createElement("link");
     link.rel = "preload";
-    link.as  = "video";
+    link.as = "video";
     link.href = url;
     document.head.appendChild(link);
     return () => {
@@ -40,11 +41,28 @@ function VideoCard({ video, onProfileClick }) {
     parseInt(comment_count, 10) || 0
   );
   const [showComments, setShowComments] = useState(false);
+  const [tagsExpanded, setTagsExpanded] = useState(false);
 
   const videoRef = useRef(null);
   const [ref, inView] = useInView({ threshold: 0.7 });
 
   const [paused, setPaused] = useState(true);
+
+  // Split tags string into array, trimming whitespace:
+  const tagsArray = tags
+    ? tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [];
+
+  // How many to show when collapsed:
+  const VISIBLE_COUNT = 3;
+  const visibleTags = tagsExpanded
+    ? tagsArray
+    : tagsArray.slice(0, VISIBLE_COUNT);
+
+  console.log("Videotags", tagsArray, visibleTags);
   // Auto-play/pause
   useEffect(() => {
     const vid = videoRef.current;
@@ -82,6 +100,8 @@ function VideoCard({ video, onProfileClick }) {
   }
 
   async function toggleLike() {
+    console.log("Video", video);
+
     if (!user) {
       alert("Please log in to like/unlike.");
       return;
@@ -168,6 +188,25 @@ function VideoCard({ video, onProfileClick }) {
           Hot girl etc description big ass Hot girl etc description big ass Hot
           girl
         </span>
+        {tagsArray.length > 0 && (
+          <div className="tag-list">
+            {visibleTags.map((tag, i) => (
+              <div key={i} className="tag-item">
+                #{tag}
+              </div>
+            ))}
+            {tagsArray.length > VISIBLE_COUNT && (
+              <button
+                className="tag-toggle-btn"
+                onClick={() => setTagsExpanded((e) => !e)}
+              >
+                {tagsExpanded
+                  ? "Show less"
+                  : `+${tagsArray.length - VISIBLE_COUNT} more`}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

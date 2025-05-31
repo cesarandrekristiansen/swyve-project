@@ -69,25 +69,22 @@ exports.saveMetadata = async (req, res) => {
 exports.getAllVideos = async (req, res) => {
   const userId = req.userId; // might be undefined if not logged in
   const limit = parseInt(req.query.limit) || 10;
-  const offset = parseInt(req.query.offset) || 0;  
+  const offset = parseInt(req.query.offset) || 0;
 
   const cacheKey = `allVideos:${limit}:${offset}`;
   const cached = cache.get(cacheKey);
   if (cached) {
     console.log("getAllVideos: serving from cache");
     return res.json(cached);
-  }       
+  }
 
   try {
-        // 1) fetch basic info plus total likes
+    // 1) fetch basic info plus total likes
     // We'll group by v.id, then do a COUNT(*) from video_likes
     const result = await pool.query(
       `
       SELECT
-        v.id,
-        v.title,
-        v.url,
-        v.user_id,
+        v.*,
         u.username,
         u.profile_pic_url,
         COUNT(DISTINCT vl.id) AS likes_count,
@@ -101,12 +98,12 @@ exports.getAllVideos = async (req, res) => {
       LIMIT $1
       OFFSET $2                                              
       `,
-      [limit, offset]                                         
+      [limit, offset]
     );
 
     let videos = result.rows; // each row has v.*, u.*, plus likes_count
 
-        // 2) if userId is present, figure out which videos this user liked
+    // 2) if userId is present, figure out which videos this user liked
     if (userId) {
       const likedResult = await pool.query(
         `SELECT video_id FROM video_likes WHERE user_id = $1`,
@@ -114,13 +111,13 @@ exports.getAllVideos = async (req, res) => {
       );
       const likedVideoIds = new Set(likedResult.rows.map((r) => r.video_id));
 
-           // 3) merge isLiked into each video
+      // 3) merge isLiked into each video
       videos = videos.map((vid) => ({
         ...vid,
         isliked: likedVideoIds.has(parseInt(vid.id, 10)),
       }));
     } else {
-            // not logged in => isliked = false
+      // not logged in => isliked = false
       videos = videos.map((vid) => ({ ...vid, isliked: false }));
     }
 
@@ -234,10 +231,7 @@ exports.getFollowingVideos = async (req, res) => {
     const result = await pool.query(
       `
       SELECT
-        v.id,
-        v.title,
-        v.url,
-        v.user_id,
+        v.*,
         u.username,
         u.profile_pic_url,
         COUNT(DISTINCT vl.id) AS likes_count,
