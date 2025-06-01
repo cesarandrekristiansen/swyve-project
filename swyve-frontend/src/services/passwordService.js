@@ -1,41 +1,69 @@
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL || "https://swyve-backend.onrender.com";
 
-function getCsrfToken() {
+async function fetchCsrfToken() {
+  const res = await fetch(`${process.env.REACT_APP_API_URLI_URL}/csrf-token`, {
+    method: "GET",
+    credentials: "include",
+  });
+  if (!res.ok) {
+    throw new Error("error getting token");
+  }
+  const data = await res.json();
+  return data.csrfToken;
+}
+
+function getCsrfTokenFromCookie() {
   const match = document.cookie.match(/_csrf=([^;]+)/);
   return match ? decodeURIComponent(match[1]) : "";
 }
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export async function sendResetEmail(email) {
-  if (!emailRegex.test(email)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new Error("Invalid email");
   }
-  const res = await fetch(`${API_URL}/forgot-password`, {
+
+  await fetchCsrfToken();
+
+
+  const csrf = getCsrfTokenFromCookie();
+  const res = await fetch(`${process.env.REACT_APP_API_URL}/forgot-password`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-Token": getCsrfToken(),
+      "X-CSRF-Token": csrf,
     },
     body: JSON.stringify({ email }),
-    credentials: "include",
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || data.message);
+
+  let data;
+  try {
+    data = await res.json();
+  } catch (e) {
+    throw new Error("unexpected response");
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "error email");
+  }
   return data;
 }
 
 export async function resetPassword(token, newPassword) {
-  const res = await fetch(`${API_URL}/reset-password`, {
+  await fetchCsrfToken();
+  const csrf = getCsrfTokenFromCookie();
+  const res = await fetch(`${process.env.REACT_APP_API_URL}/reset-password`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-Token": getCsrfToken(),
+      "X-CSRF-Token": csrf,
     },
     body: JSON.stringify({ token, newPassword }),
-    credentials: "include",
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data.error || data.message);
+  if (!res.ok) {
+    throw new Error(data.error || data.message || "error reset");
+  }
   return data;
 }

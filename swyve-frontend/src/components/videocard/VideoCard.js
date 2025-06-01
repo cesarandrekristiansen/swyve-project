@@ -21,17 +21,6 @@ function VideoCard({ video, onProfileClick }) {
     tags,
   } = video;
 
-  // preload logikk
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as = "video";
-    link.href = url;
-    document.head.appendChild(link);
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, [url]);
 
   const { user } = useAuth();
   const navigate = useNavigate();

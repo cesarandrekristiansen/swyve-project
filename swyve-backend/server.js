@@ -7,17 +7,19 @@ const corsMiddleware = require("./middleware/corsConfig");
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
+// må være i denne rekkefølgen
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(corsMiddleware);
 
+const passwordRoutes = require("./routes/passwordRoutes");
+app.use(passwordRoutes);
 // ========== MIDDLEWARE ==========
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
   next();
 });
-
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(corsMiddleware);
 
 // ========== ROUTES ==========
 const authRoutes = require("./routes/authRoutes");
@@ -27,7 +29,6 @@ const videoRoutes = require("./routes/videoRoutes");
 const playlistRoutes = require("./routes/playlistRoutes");
 const likeRoutes = require("./routes/likeRoutes");
 const searchRoutes = require("./routes/searchRoutes");
-const passwordRoutes = require("./routes/passwordRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 
@@ -38,7 +39,7 @@ app.use(videoRoutes);
 app.use(playlistRoutes);
 app.use(likeRoutes);
 app.use(searchRoutes);
-app.use(passwordRoutes);
+
 app.use(commentRoutes);
 app.use(applicationRoutes);
 
