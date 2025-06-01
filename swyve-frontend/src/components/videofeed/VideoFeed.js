@@ -1,9 +1,10 @@
-import React, { useRef, useEffect,  useState,  useCallback,} from "react";
+import React, {  useRef, useEffect, useState, useCallback,} from "react";
 import { FixedSizeList as List } from "react-window";
 import { useVideos } from "../../hooks/videoHooks";
 import VideoCard from "../videocard/VideoCard";
 import Loading from "../../components/loading/Loading";
 import "./VideoFeed.css";
+import { Helmet } from "react-helmet";
 
 const SCROLL_THRESHOLD_PX = 600;
 
@@ -20,12 +21,13 @@ function useDebouncedCallback(callback, delay) {
     [callback, delay]
   );
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);}
-    },[]
-  );
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return debouncedFn;
 }
@@ -40,6 +42,9 @@ export default function VideoFeed({
 }) {
   const isControlled = Array.isArray(controlledVideos);
   const [selectedTab, setSelectedTab] = useState("for-you");
+  const [currentIndex, setCurrentIndex] = useState(
+    startIndex > 0 ? startIndex : 0
+  );
 
   const type = selectedTab === "following" ? "following" : "all";
   const {
@@ -62,24 +67,24 @@ export default function VideoFeed({
   useEffect(() => {
     if (listRef.current && startIndex > 0) {
       listRef.current.scrollToItem(startIndex, "start");
+      setCurrentIndex(startIndex);
     }
   }, [startIndex]);
-  const onScrollCallback = useCallback(
-    ({ scrollDirection, scrollUpdateWasRequested, scrollOffset }) => {
-      if (scrollUpdateWasRequested) {
-        return;
-      }
-      debouncedSnap(scrollOffset);
-    },
-    []
-  );
+
+  const nextIndex =
+    allVideos.length > 0
+      ? (currentIndex + 1) % allVideos.length
+      : null;
+  const nextVideoUrl =
+    nextIndex !== null ? allVideos[nextIndex]?.url : null;
 
   const debouncedSnap = useDebouncedCallback((scrollOffset) => {
     if (!listRef.current) return;
     const exactIndex = scrollOffset / itemSize;
     const nearestIndex = Math.round(exactIndex);
     listRef.current.scrollToItem(nearestIndex, "start");
-  }, 50);
+    setCurrentIndex(nearestIndex);
+  }, 40);
 
   const handleScrollThreshold = useCallback(() => {
     const el = outerRef.current;
@@ -102,33 +107,52 @@ export default function VideoFeed({
     onLoadMore,
   ]);
 
-  const onScrollHandler = (e) => {
+  const onScrollHandler = () => {
     handleScrollThreshold();
     const scrollOffset = outerRef.current?.scrollTop ?? 0;
-    onScrollCallback({
-      scrollOffset,
-      scrollDirection: null,
-      scrollUpdateWasRequested: false,
-    });
+    debouncedSnap(scrollOffset);
   };
 
   const itemCount = allVideos.length;
 
   return (
     <div className="video-feed-background">
+      <Helmet>
+        {nextVideoUrl && (
+          <link
+            rel="preload"
+            as="video"
+            href={nextVideoUrl}
+            type="video/mp4"
+          />
+        )}
+      </Helmet>
+
       {isFetching && !isFetchingNextPage && <Loading />}
 
       {showTabs && (
         <div className="feed-tabs">
           <button
             className={selectedTab === "for-you" ? "tab active" : "tab"}
-            onClick={() => setSelectedTab("for-you")}
+            onClick={() => {
+              setSelectedTab("for-you");
+              setCurrentIndex(0);
+              if (listRef.current) {
+                listRef.current.scrollToItem(0, "start");
+              }
+            }}
           >
             For you
           </button>
           <button
             className={selectedTab === "following" ? "tab active" : "tab"}
-            onClick={() => setSelectedTab("following")}
+            onClick={() => {
+              setSelectedTab("following");
+              setCurrentIndex(0);
+              if (listRef.current) {
+                listRef.current.scrollToItem(0, "start");
+              }
+            }}
           >
             Following
           </button>
@@ -151,7 +175,10 @@ export default function VideoFeed({
         ref={listRef}
         outerRef={outerRef}
         onScroll={onScrollHandler}
-        onItemsRendered={({ visibleStopIndex }) => {
+        onItemsRendered={({ visibleStartIndex, visibleStopIndex }) => {
+          if (visibleStartIndex !== undefined) {
+            setCurrentIndex(visibleStartIndex);
+          }
           if (
             visibleStopIndex >= allVideos.length - 1 &&
             hasMore &&

@@ -1,8 +1,8 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { IoMdHeart, IoIosSave } from "react-icons/io";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
-import { FaShare, FaPlay } from "react-icons/fa";
+import { FaShare, FaPlay, FaVolumeUp } from "react-icons/fa";
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CommentModal from "../comment/CommentModal";
@@ -63,35 +63,59 @@ function VideoCard({ video, onProfileClick }) {
     : tagsArray.slice(0, VISIBLE_COUNT);
 
   console.log("Videotags", tagsArray, visibleTags);
-  // Auto-play/pause
+  const [unmutedByUser, setUnmutedByUser] = useState(false);
+
   useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
+    vidEl.muted = true;
     if (inView) {
-      vid.play().catch((err) => {
-        console.warn("Autoplay prevented, user interaction required", err);
+      vidEl.play().catch((err) => {
+        console.debug("Muted autoplay err", err);
       });
     } else {
-      vid.pause();
+      vidEl.pause();
     }
   }, [inView]);
 
   useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
     const onPlay = () => setPaused(false);
     const onPause = () => setPaused(true);
-    vid.addEventListener("play", onPlay);
-    vid.addEventListener("pause", onPause);
+    vidEl.addEventListener("play", onPlay);
+    vidEl.addEventListener("pause", onPause);
     return () => {
-      vid.removeEventListener("play", onPlay);
-      vid.removeEventListener("pause", onPause);
+      vidEl.removeEventListener("play", onPlay);
+      vidEl.removeEventListener("pause", onPause);
     };
   }, []);
 
-  const handlePlay = () => {
-    const vid = videoRef.current;
-    if (vid) vid.play();
+  const handlePlayClick = () => {
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
+
+    if (unmutedByUser) {
+      vidEl.muted = false;
+    }
+
+    vidEl.play().catch((err) => {
+      console.warn("paused", err);
+    });
+  };
+
+  const handleUnmuteClick = () => {
+    const vidEl = videoRef.current;
+    if (!vidEl) return;
+    setUnmutedByUser(true);
+    vidEl
+      .play()
+      .then(() => {
+        vidEl.muted = false;
+      })
+      .catch((err) => {
+        console.warn("muted:", err);
+      });
   };
 
   function handleProfileClick() {
@@ -139,12 +163,20 @@ function VideoCard({ video, onProfileClick }) {
         className="video-player"
         loop
         playsInline
-        controls
+        autoPlay={false}
         preload="auto"
       />
+
+      <div className="unmute">
+        {inView && (
+          <button className="video-unmute-button" onClick={handleUnmuteClick}>
+            <FaVolumeUp size={24} color="white" />
+          </button>
+        )}
+      </div>
       {paused && (
-        <div className="video-paused-overlay" onClick={handlePlay}>
-          <FaPlay />
+        <div className="video-paused-overlay" onClick={handlePlayClick}>
+          <FaPlay size={48} color="white" />
         </div>
       )}
 
@@ -182,10 +214,8 @@ function VideoCard({ video, onProfileClick }) {
         </button>
       </div>
 
-      <div className="video-overlay">
-        <span className="video-username" onClick={handleProfileClick}>
-          {username}
-        </span>
+      <div className="video-overlay" onClick={handleProfileClick}>
+        <span className="video-username">{username}</span>
         <span className="video-description">
           Hot girl etc description big ass Hot girl etc description big ass Hot
           girl
