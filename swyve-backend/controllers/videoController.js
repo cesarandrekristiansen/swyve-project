@@ -7,7 +7,7 @@ const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
 exports.uploadVideo = async (req, res) => {
   console.log("uploadVideo controller is loaded!");
 
-  const userId = req.userId; // from your authMiddleware
+  const userId = req.userId;
   const { rows } = await pool.query("SELECT role FROM users WHERE id = $1", [
     userId,
   ]);

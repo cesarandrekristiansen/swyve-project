@@ -1,4 +1,3 @@
-// src/pages/ApplyCreator/ApplyCreator.jsx
 import React, { useState, useContext, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
@@ -9,7 +8,6 @@ export default function ApplicationCreator() {
   const navigate = useNavigate();
   const url = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
-  // Local form state:
   const [message, setMessage] = useState("");
   const [socialLink, setSocialLink] = useState("");
   const [imageFile, setImageFile] = useState(null);
@@ -43,13 +41,11 @@ export default function ApplicationCreator() {
     );
   }
 
-  // 4) Otherwise, render the form:
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    // Basic validation:
     if (!message || message.trim().length < 10) {
       setError("Your message must be at least 10 characters.");
       return;
@@ -88,9 +84,8 @@ export default function ApplicationCreator() {
         throw new Error(data.error || "Failed to send application.");
       }
 
-      // Success: show a message and update `application_sent` locally:
       setSuccess("Your application was sent! Please wait for approval.");
-      // Update the context so application_sent flips to true:
+
       setUser((prev) => ({ ...prev, application_sent: true }));
     } catch (err) {
       console.error("Apply error:", err);

@@ -1,4 +1,3 @@
-// src/components/profile/ProfileHeader.js
 import React from "react";
 import { FaCamera } from "react-icons/fa";
 import "./ProfileHeader.css";
@@ -13,7 +12,6 @@ export default function ProfileHeader({
 }) {
   return (
     <>
-      {/* Cover area */}
       <div className="cover-container">
         {coverUrl ? (
           <img className="cover-pic" src={coverUrl} alt="Cover" />
@@ -23,7 +21,6 @@ export default function ProfileHeader({
 
         {isMyProfile && (
           <>
-            {/* Hidden file input for cover */}
             <input
               id="coverInput"
               type="file"
@@ -31,7 +28,6 @@ export default function ProfileHeader({
               style={{ display: "none" }}
               onChange={handleCoverPicChange}
             />
-            {/* Button to trigger cover input */}
             <label
               htmlFor="coverInput"
               className="cover-button"
@@ -44,7 +40,6 @@ export default function ProfileHeader({
         )}
       </div>
 
-      {/* Profile picture */}
       <div className="profile-header">
         <div className="profile-avatar-wrapper">
           <img
@@ -56,7 +51,6 @@ export default function ProfileHeader({
               isMyProfile && document.getElementById("picInput").click()
             }
           />
-          {/* Hidden file input for profile pic */}
           {isMyProfile && (
             <input
               id="picInput"

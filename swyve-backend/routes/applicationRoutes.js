@@ -6,11 +6,10 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// POST /api/users/:userId/apply-creator
 router.post(
   "/api/users/:userId/apply-creator",
-  authMiddleware, // ensures req.userId is set
-  upload.single("proofImage"), // reads the <input name="proofImage" /> file into req.file
+  authMiddleware,
+  upload.single("proofImage"),
   applicationController.applyCreator
 );
 

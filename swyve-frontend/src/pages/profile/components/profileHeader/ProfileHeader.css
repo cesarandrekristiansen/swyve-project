@@ -51,8 +51,6 @@
   object-fit: cover;
 }
 
-/* src/pages/profile/components/profileHeader/ProfileHeader.css */
-
 /* Position the badge over the bottom-right corner of the avatar */
 .profile-avatar-wrapper {
   position: relative;
