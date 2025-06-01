@@ -1,70 +1,37 @@
-const API_URL = process.env.REACT_APP_API_URL || "https://swyve-backend.onrender.com";
-
-async function fetchCsrfToken() {
-  const res = await fetch(`${API_URL}/csrf-token`, {
-    method: "GET",
-    credentials: "include",
-  });
-  if (!res.ok) {
-    throw new Error("error getting token");
-  }
-  const data = await res.json();
-  return data.csrfToken;
-}
+const API_URL = process.env.REACT_APP_API_URL;
 
 export async function sendResetEmail(email) {
-
-  const csrfToken = await fetchCsrfToken();
-
   const res = await fetch(`${API_URL}/forgot-password`, {
     method: "POST",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-Token": csrfToken,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
-
   const text = await res.text();
   let data;
   try {
     data = JSON.parse(text);
-  } catch (err) {
-    throw new Error("unexpected response");
+  } catch {
+    throw new Error(`Expected JSON from /forgot-password but received:\n${text.slice(0,200)}`);
   }
-
-  if (!res.ok) {
-    throw new Error(data.error || data.message || "error email");
-  }
+  if (!res.ok) throw new Error(data.error || data.message);
   return data;
 }
 
 export async function resetPassword(token, newPassword) {
-  const csrfToken = await fetchCsrfToken();
-
   const res = await fetch(`${API_URL}/reset-password`, {
     method: "POST",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-Token": csrfToken,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, newPassword }),
   });
-
   const text = await res.text();
   let data;
   try {
     data = JSON.parse(text);
-  } catch (err) {
-    throw new Error(
-      `Try agian`
-    );
+  } catch {
+    throw new Error(`Expected JSON from /reset-password but received:\n${text.slice(0,200)}`);
   }
-
-  if (!res.ok) {
-    throw new Error(data.error || data.message || "error reset");
-  }
+  if (!res.ok) throw new Error(data.error || data.message);
   return data;
 }
