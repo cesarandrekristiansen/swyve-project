@@ -1,7 +1,7 @@
 const API_URL = process.env.REACT_APP_API_URL || "https://swyve-backend.onrender.com";
 
 async function fetchCsrfToken() {
-  const res = await fetch(`${process.env.REACT_APP_API_URLI_URL}/csrf-token`, {
+  const res = await fetch(`${API_URL}/csrf-token`, {
     method: "GET",
     credentials: "include",
   });
@@ -12,34 +12,25 @@ async function fetchCsrfToken() {
   return data.csrfToken;
 }
 
-function getCsrfTokenFromCookie() {
-  const match = document.cookie.match(/_csrf=([^;]+)/);
-  return match ? decodeURIComponent(match[1]) : "";
-}
-
 export async function sendResetEmail(email) {
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new Error("Invalid email");
-  }
 
-  await fetchCsrfToken();
+  const csrfToken = await fetchCsrfToken();
 
-
-  const csrf = getCsrfTokenFromCookie();
-  const res = await fetch(`${process.env.REACT_APP_API_URL}/forgot-password`, {
+  const res = await fetch(`${API_URL}/forgot-password`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-Token": csrf,
+      "X-CSRF-Token": csrfToken,
     },
     body: JSON.stringify({ email }),
   });
 
+  const text = await res.text();
   let data;
   try {
-    data = await res.json();
-  } catch (e) {
+    data = JSON.parse(text);
+  } catch (err) {
     throw new Error("unexpected response");
   }
 
@@ -50,18 +41,28 @@ export async function sendResetEmail(email) {
 }
 
 export async function resetPassword(token, newPassword) {
-  await fetchCsrfToken();
-  const csrf = getCsrfTokenFromCookie();
-  const res = await fetch(`${process.env.REACT_APP_API_URL}/reset-password`, {
+  const csrfToken = await fetchCsrfToken();
+
+  const res = await fetch(`${API_URL}/reset-password`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-Token": csrf,
+      "X-CSRF-Token": csrfToken,
     },
     body: JSON.stringify({ token, newPassword }),
   });
-  const data = await res.json();
+
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    throw new Error(
+      `Try agian`
+    );
+  }
+
   if (!res.ok) {
     throw new Error(data.error || data.message || "error reset");
   }
