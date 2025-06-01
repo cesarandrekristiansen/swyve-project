@@ -75,7 +75,7 @@ function App() {
             <FaSearch />
           </NavLink>
           <NavLink
-            to={user.role === "creator" ? "/upload" : "/apply-creator"}
+            to={user?.role === "creator" ? "/upload" : "/apply-creator"}
             className="nav-item upload-btn"
           >
             <FaPlusCircle />
