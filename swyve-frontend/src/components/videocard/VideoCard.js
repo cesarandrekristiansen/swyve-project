@@ -214,8 +214,10 @@ function VideoCard({ video, onProfileClick }) {
         </button>
       </div>
 
-      <div className="video-overlay" onClick={handleProfileClick}>
-        <span className="video-username">{username}</span>
+      <div className="video-overlay">
+        <span className="video-username" onClick={handleProfileClick}>
+          {username}
+        </span>
         <span className="video-description">
           Hot girl etc description big ass Hot girl etc description big ass Hot
           girl
