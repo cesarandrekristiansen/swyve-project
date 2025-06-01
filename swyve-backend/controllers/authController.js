@@ -96,10 +96,9 @@ exports.logout = (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const userId = req.userId;
-    const result = await pool.query(
-      "SELECT id, email FROM users WHERE id = $1",
-      [userId]
-    );
+    const result = await pool.query("SELECT * FROM users WHERE id = $1", [
+      userId,
+    ]);
     const user = result.rows[0];
 
     if (!user) return res.status(404).json({ error: "User not found" });

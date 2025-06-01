@@ -9,6 +9,7 @@ export default function ProfileHeader({
   isMyProfile,
   handleCoverPicChange,
   handleProfilePicChange,
+  profileData,
 }) {
   return (
     <>
@@ -45,25 +46,30 @@ export default function ProfileHeader({
 
       {/* Profile picture */}
       <div className="profile-header">
-        <img
-          className="profile-pic"
-          src={profilePicUrl || "/images/profile-pic.png"}
-          alt="Profile"
-          style={{ cursor: isMyProfile ? "pointer" : "default" }}
-          onClick={() =>
-            isMyProfile && document.getElementById("picInput").click()
-          }
-        />
-        {/* Hidden file input for profile pic */}
-        {isMyProfile && (
-          <input
-            id="picInput"
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleProfilePicChange}
+        <div className="profile-avatar-wrapper">
+          <img
+            className="profile-pic"
+            src={profilePicUrl || "/images/profile-pic.png"}
+            alt="Profile"
+            style={{ cursor: isMyProfile ? "pointer" : "default" }}
+            onClick={() =>
+              isMyProfile && document.getElementById("picInput").click()
+            }
           />
-        )}
+          {/* Hidden file input for profile pic */}
+          {isMyProfile && (
+            <input
+              id="picInput"
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleProfilePicChange}
+            />
+          )}
+          {profileData.role === "creator" && (
+            <span className="creator-badge">★</span>
+          )}
+        </div>
       </div>
     </>
   );

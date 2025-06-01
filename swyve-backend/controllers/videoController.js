@@ -6,6 +6,18 @@ const cache = new NodeCache({ stdTTL: 60, checkperiod: 120 });
 
 exports.uploadVideo = async (req, res) => {
   console.log("uploadVideo controller is loaded!");
+
+  const userId = req.userId; // from your authMiddleware
+  const { rows } = await pool.query("SELECT role FROM users WHERE id = $1", [
+    userId,
+  ]);
+
+  if (!rows.length || rows[0].role !== "creator") {
+    return res
+      .status(403)
+      .json({ error: "You must be an approved creator to upload videos." });
+  }
+
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
@@ -53,6 +65,16 @@ exports.saveMetadata = async (req, res) => {
   }
   const { title, thumbnail, duration, tags, embed_code, videoUrl } = req.body;
   const userId = req.userId;
+
+  const { rows } = await pool.query("SELECT role FROM users WHERE id = $1", [
+    userId,
+  ]);
+  if (!rows.length || rows[0].role !== "creator") {
+    return res
+      .status(403)
+      .json({ error: "You must be an approved creator to upload videos." });
+  }
+
   try {
     const result = await pool.query(
       "INSERT INTO videos (title, url, thumbnail, duration, tags, embed_code, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",

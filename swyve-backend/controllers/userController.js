@@ -7,10 +7,9 @@ exports.getUserProfile = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const userResult = await pool.query(
-      "SELECT id, username, bio, profile_pic_url, cover_pic_url FROM users WHERE id = $1",
-      [userId]
-    );
+    const userResult = await pool.query("SELECT * FROM users WHERE id = $1", [
+      userId,
+    ]);
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -46,6 +45,8 @@ exports.getUserProfile = async (req, res) => {
       bio: userRow.bio,
       profile_pic_url: userRow.profile_pic_url,
       cover_pic_url: userRow.cover_pic_url,
+      role: userRow.role,
+      application_sent: userRow.application_sent,
       followers: followersCount,
       following: followingCount,
       totalLikesCount,

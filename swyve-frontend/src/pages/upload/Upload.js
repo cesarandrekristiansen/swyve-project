@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Upload.css";
 import Loading from "../../components/loading/Loading";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../auth/AuthContext";
 
 function Upload() {
   const [file, setFile] = useState(null);
@@ -9,11 +11,19 @@ function Upload() {
   const [tags, setTags] = useState([]);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
 
   const url = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
+  const { user } = useAuth();
 
   const MAX_FILE_SIZE_MB = 100;
   const ALLOWED_TYPES = ["video/mp4", "video/webm", "video/ogg"];
+
+  useEffect(() => {
+    if (!uploading && user?.role !== "creator") {
+      navigate("/apply-creator");
+    }
+  }, [user, uploading, navigate]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];

@@ -23,6 +23,7 @@ import {
 import { useAuth } from "./auth/AuthContext";
 import ForgotPassword from "../src/reset_password/ForgotPassword";
 import ResetPassword from "../src/reset_password/reset";
+import ApplicationCreator from "./pages/applicationCreator/ApplicationCreator";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -45,7 +46,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
@@ -59,6 +60,7 @@ function App() {
             <Route path="/trending" element={<Search />} />
             <Route path="/hashtag/:tag" element={<HashtagPage />} />
             <Route path="/stats" element={<Stats />} />
+            <Route path="/apply-creator" element={<ApplicationCreator />} />
           </Route>
         </Routes>
       </div>
@@ -72,7 +74,10 @@ function App() {
           <NavLink to="/trending" className="nav-item">
             <FaSearch />
           </NavLink>
-          <NavLink to="/upload" className="nav-item upload-btn">
+          <NavLink
+            to={user.role === "creator" ? "/upload" : "/apply-creator"}
+            className="nav-item upload-btn"
+          >
             <FaPlusCircle />
           </NavLink>
           <NavLink to="/inbox" className="nav-item">

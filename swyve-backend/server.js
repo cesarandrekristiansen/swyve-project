@@ -29,6 +29,7 @@ const likeRoutes = require("./routes/likeRoutes");
 const searchRoutes = require("./routes/searchRoutes");
 const passwordRoutes = require("./routes/passwordRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const applicationRoutes = require("./routes/applicationRoutes");
 
 app.use(authRoutes);
 app.use(userRoutes);
@@ -39,6 +40,7 @@ app.use(likeRoutes);
 app.use(searchRoutes);
 app.use(passwordRoutes);
 app.use(commentRoutes);
+app.use(applicationRoutes);
 
 // ========== START SERVER ==========
 app.listen(PORT, () => {

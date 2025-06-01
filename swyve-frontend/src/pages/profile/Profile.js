@@ -244,6 +244,7 @@ function Profile() {
             isMyProfile={isMyProfile}
             handleCoverPicChange={handleCoverPicChange}
             handleProfilePicChange={handleProfilePicChange}
+            profileData={currentUser}
           />
           <ProfileInfo
             profileData={profileData}

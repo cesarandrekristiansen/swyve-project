@@ -1,6 +1,5 @@
 const API_URL = process.env.REACT_APP_API_URL;
 
-
 function getCsrfToken() {
   const match = document.cookie.match(/_csrf=([^;]+)/);
   return match ? decodeURIComponent(match[1]) : "";
