@@ -130,3 +130,9 @@
   font-size: 0.9rem;
   color: #ccc;
 }
+
+.search-result-card .likes-count {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-top: 4px;
+}

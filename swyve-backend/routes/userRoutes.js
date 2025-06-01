@@ -6,12 +6,15 @@ const {
   updateBio,
   updateProfilePic,
   updateCoverPic,
+  getTopCreators,
 } = require("../controllers/userController");
 const { body, param } = require("express-validator");
 
 const uploadImage = require("../middleware/multerImageConfig");
 
 const router = express.Router();
+
+router.get("/api/users/top-creators", getTopCreators);
 
 router.get("/api/users/:userId", getUserProfile);
 

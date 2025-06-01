@@ -206,3 +206,43 @@ exports.updateCoverPic = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+
+exports.getTopCreators = async (req, res) => {
+  try {
+    // 1) Fetch creators and count their total likes
+    //   - join videos v on users.id = v.user_id
+    //   - left join video_likes vl on v.id = vl.video_id
+    //   - group by user.id
+    //   - order by that like‐count DESC
+    //   - limit 5
+    const result = await pool.query(
+      `
+      SELECT
+        u.id,
+        u.username,
+        u.profile_pic_url,
+        COUNT(vl.id) AS total_likes
+      FROM users u
+      JOIN videos v ON v.user_id = u.id
+      LEFT JOIN video_likes vl ON vl.video_id = v.id
+      WHERE u.role = 'creator'
+      GROUP BY u.id, u.username, u.profile_pic_url
+      ORDER BY total_likes DESC
+      LIMIT 5
+      `
+    );
+
+    // 2) Parse integers
+    const creators = result.rows.map((row) => ({
+      id: row.id,
+      username: row.username,
+      profile_pic_url: row.profile_pic_url,
+      totalLikesCount: parseInt(row.total_likes, 10),
+    }));
+
+    return res.json(creators);
+  } catch (error) {
+    console.error("Error in getTopCreators:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
