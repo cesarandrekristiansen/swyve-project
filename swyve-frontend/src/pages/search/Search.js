@@ -14,6 +14,7 @@ function Search() {
   const [inputFocused, setInputFocused] = useState(false);
   const [popularHashtags, setPopularHashtags] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [topCreators, setTopCreators] = useState([]);
 
   const inputRef = useRef();
   const navigate = useNavigate();
@@ -23,9 +24,22 @@ function Search() {
   useEffect(() => {
     if (!inputFocused) {
       setLoading(true);
-      fetch(`${backendUrl}/api/hashtags/top`)
-        .then((res) => res.json())
-        .then(setPopularHashtags)
+
+      // 1) Fetch popular hashtags
+      const p1 = fetch(`${backendUrl}/api/hashtags/top`).then((res) =>
+        res.json()
+      );
+
+      // 2) Fetch top creators
+      const p2 = fetch(`${backendUrl}/api/users/top-creators`).then((res) =>
+        res.json()
+      );
+
+      Promise.all([p1, p2])
+        .then(([hashtagsData, creatorsData]) => {
+          setPopularHashtags(hashtagsData);
+          setTopCreators(creatorsData);
+        })
         .catch(console.error)
         .finally(() => setLoading(false));
     }
@@ -105,7 +119,33 @@ function Search() {
           </div>
           <div>
             <h3>Top Creators this week</h3>
-            <p>Under construction...🛠️</p>
+            {loading && <Loading />}
+
+            {!loading && topCreators.length === 0 && (
+              <p style={{ color: "#ccc" }}>No creators to show.</p>
+            )}
+
+            {!loading &&
+              topCreators.length > 0 &&
+              topCreators.map((creator) => (
+                <div
+                  key={creator.id}
+                  className="search-result-card user"
+                  onClick={() => navigate(`/profile/${creator.id}`)}
+                >
+                  <img
+                    src={creator.profile_pic_url || "/images/profile-pic.png"}
+                    alt={creator.username}
+                  />
+                  <div className="text">
+                    <p className="username">@{creator.username}</p>
+                    <p className="type">Creator</p>
+                    <p className="likes-count">
+                      {creator.totalLikesCount.toLocaleString()} likes
+                    </p>
+                  </div>
+                </div>
+              ))}
           </div>
         </>
       ) : (
