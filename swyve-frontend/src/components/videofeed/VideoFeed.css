@@ -22,12 +22,14 @@
   height: 100dvh;
   overflow-y: scroll;
   scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
 }
 
 /* Each full-screen slide */
 .video-feed-slide {
   width: 100vw;
   height: 100dvh;
+  scroll-snap-align: start; 
 }
 @media (max-width: 768px) {
 .video-feed-slide {

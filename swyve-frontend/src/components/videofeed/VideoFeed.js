@@ -1,35 +1,32 @@
-import React, {  useRef, useEffect, useState, useCallback,} from "react";
-import { FixedSizeList as List } from "react-window";
-import { useVideos } from "../../hooks/videoHooks";
-import VideoCard from "../videocard/VideoCard";
-import Loading from "../../components/loading/Loading";
-import "./VideoFeed.css";
-import { Helmet } from "react-helmet";
+import React, { useRef, useEffect, useState, useCallback } from "react"
+import { useVideos } from "../../hooks/videoHooks"
+import VideoCard from "../videocard/VideoCard"
+import Loading from "../../components/loading/Loading"
+import "./VideoFeed.css"
+import { Helmet } from "react-helmet"
 
-const SCROLL_THRESHOLD_PX = 600;
+const SCROLL_THRESHOLD_PX = 600
 
 function useDebouncedCallback(callback, delay) {
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef(null)
 
   const debouncedFn = useCallback(
     (...args) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current); }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
       timeoutRef.current = setTimeout(() => {
-        callback(...args);}, delay);
+        callback(...args)
+      }, delay)
     },
     [callback, delay]
-  );
+  )
 
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
-  return debouncedFn;
+  return debouncedFn
 }
 
 export default function VideoFeed({
@@ -40,89 +37,97 @@ export default function VideoFeed({
   onClose,
   showTabs = false,
 }) {
-  const isControlled = Array.isArray(controlledVideos);
-  const [selectedTab, setSelectedTab] = useState("for-you");
-  const [currentIndex, setCurrentIndex] = useState(
-    startIndex > 0 ? startIndex : 0
-  );
+  const isControlled = Array.isArray(controlledVideos)
+  const [selectedTab, setSelectedTab] = useState("for-you")
+  const [currentIndex, setCurrentIndex] = useState(startIndex > 0 ? startIndex : 0)
 
-  const type = selectedTab === "following" ? "following" : "all";
+  const type = selectedTab === "following" ? "following" : "all"
+  const userId = null
+
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-  } = useVideos({ type });
+  } = useVideos({ type, userId })
 
-  const fetchedVideos = data?.pages.flat() || [];
-  const allVideos = isControlled ? controlledVideos : fetchedVideos;
-  const hasMore = isControlled ? hasMoreProp : hasNextPage;
+  const fetchedVideos = data.pages.flat()
+  const allVideos = isControlled ? controlledVideos : fetchedVideos
+  const hasMore = isControlled ? hasMoreProp : hasNextPage
 
-  const listRef = useRef(null);
-  const outerRef = useRef(null);
-
-  const itemSize = window.innerHeight;
+  const containerRef = useRef(null)
+  const itemHeight = window.innerHeight
 
   useEffect(() => {
-    if (listRef.current && startIndex > 0) {
-      listRef.current.scrollToItem(startIndex, "start");
-      setCurrentIndex(startIndex);
+    if (containerRef.current && startIndex > 0) {
+      containerRef.current.scrollTo({
+        top: startIndex * itemHeight,
+        behavior: "auto",
+      })
+      setCurrentIndex(startIndex)
     }
-  }, [startIndex]);
+  }, [startIndex, itemHeight])
 
-  const nextIndex =
-    allVideos.length > 0
-      ? (currentIndex + 1) % allVideos.length
-      : null;
-  const nextVideoUrl =
-    nextIndex !== null ? allVideos[nextIndex]?.url : null;
+  const debouncedIndexUpdate = useDebouncedCallback((scrollTop) => {
+    const approxIdx = Math.round(scrollTop / itemHeight)
+    if (approxIdx !== currentIndex) setCurrentIndex(approxIdx)
+  }, 40)
 
-  const debouncedSnap = useDebouncedCallback((scrollOffset) => {
-    if (!listRef.current) return;
-    const exactIndex = scrollOffset / itemSize;
-    const nearestIndex = Math.round(exactIndex);
-    listRef.current.scrollToItem(nearestIndex, "start");
-    setCurrentIndex(nearestIndex);
-  }, 40);
+  const handleScroll = useCallback(() => {
+    const el = containerRef.current
+    if (!el) return
 
-  const handleScrollThreshold = useCallback(() => {
-    const el = outerRef.current;
+    const { scrollTop, scrollHeight, clientHeight } = el
+    debouncedIndexUpdate(scrollTop)
+
     if (
-      !el ||
-      isFetchingNextPage ||
-      !(isControlled ? hasMoreProp : hasNextPage)
-    )
-      return;
-    const { scrollTop, scrollHeight, clientHeight } = el;
-    if (scrollHeight - (scrollTop + clientHeight) < SCROLL_THRESHOLD_PX) {
-      isControlled ? onLoadMore?.() : fetchNextPage();
+      hasMore &&
+      !isFetchingNextPage &&
+      scrollHeight - (scrollTop + clientHeight) < SCROLL_THRESHOLD_PX
+    ) {
+      isControlled ? onLoadMore?.() : fetchNextPage()
     }
   }, [
+    debouncedIndexUpdate,
     fetchNextPage,
-    isFetchingNextPage,
+    hasMore,
     isControlled,
-    hasMoreProp,
-    hasNextPage,
+    isFetchingNextPage,
     onLoadMore,
-  ]);
+  ])
 
-  const onScrollHandler = () => {
-    handleScrollThreshold();
-    const scrollOffset = outerRef.current?.scrollTop ?? 0;
-    debouncedSnap(scrollOffset);
-  };
-
-  const itemCount = allVideos.length;
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    el.addEventListener("scroll", handleScroll)
+    return () => el.removeEventListener("scroll", handleScroll)
+  }, [handleScroll])
 
   return (
     <div className="video-feed-background">
       <Helmet>
-        {nextVideoUrl && (
+        {allVideos[currentIndex + 1] && (
           <link
             rel="preload"
             as="video"
-            href={nextVideoUrl}
+            href={allVideos[currentIndex + 1].url}
+            type="video/mp4"
+          />
+        )}
+        {allVideos[currentIndex + 2] && (
+          <link
+            rel="preload"
+            as="video"
+            href={allVideos[currentIndex + 2].url}
+            type="video/mp4"
+          />
+        )}
+        {allVideos[currentIndex + 3] && (
+          <link
+            rel="preload"
+            as="video"
+            href={allVideos[currentIndex + 3].url}
             type="video/mp4"
           />
         )}
@@ -135,10 +140,10 @@ export default function VideoFeed({
           <button
             className={selectedTab === "for-you" ? "tab active" : "tab"}
             onClick={() => {
-              setSelectedTab("for-you");
-              setCurrentIndex(0);
-              if (listRef.current) {
-                listRef.current.scrollToItem(0, "start");
+              setSelectedTab("for-you")
+              setCurrentIndex(0)
+              if (containerRef.current) {
+                containerRef.current.scrollTo({ top: 0, behavior: "auto" })
               }
             }}
           >
@@ -147,10 +152,10 @@ export default function VideoFeed({
           <button
             className={selectedTab === "following" ? "tab active" : "tab"}
             onClick={() => {
-              setSelectedTab("following");
-              setCurrentIndex(0);
-              if (listRef.current) {
-                listRef.current.scrollToItem(0, "start");
+              setSelectedTab("following")
+              setCurrentIndex(0)
+              if (containerRef.current) {
+                containerRef.current.scrollTo({ top: 0, behavior: "auto" })
               }
             }}
           >
@@ -158,46 +163,26 @@ export default function VideoFeed({
           </button>
         </div>
       )}
+
       {onClose && (
         <button className="video-feed-close" onClick={onClose}>
           ✕
         </button>
       )}
 
-      <List
-        className="video-feed-container-feed"
-        height={window.innerHeight}
-        width="100%"
-        role="list"
-        itemCount={itemCount}
-        itemSize={itemSize}
-        overscanCount={2}
-        ref={listRef}
-        outerRef={outerRef}
-        onScroll={onScrollHandler}
-        onItemsRendered={({ visibleStartIndex, visibleStopIndex }) => {
-          if (visibleStartIndex !== undefined) {
-            setCurrentIndex(visibleStartIndex);
-          }
-          if (
-            visibleStopIndex >= allVideos.length - 1 &&
-            hasMore &&
-            !isFetchingNextPage
-          ) {
-            isControlled ? onLoadMore?.() : fetchNextPage();
-          }
-        }}
-      >
-        {({ index, style }) => {
-          const video = allVideos[index];
-          if (!video) return null;
-          return (
-            <div style={style} className="video-feed-slide">
-              <VideoCard video={video} />
-            </div>
-          );
-        }}
-      </List>
+      <div className="video-feed-container-feed" ref={containerRef}>
+        {allVideos.map((video) => (
+          <div key={video.id} className="video-feed-slide">
+            <VideoCard video={video} />
+          </div>
+        ))}
+
+        {isFetchingNextPage && (
+          <div className="video-feed-loading">
+            <Loading />
+          </div>
+        )}
+      </div>
     </div>
-  );
+  )
 }

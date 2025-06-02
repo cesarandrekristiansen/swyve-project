@@ -6,6 +6,7 @@ const {
   getAllVideos,
   getUserVideos,
   getFollowingVideos,
+  getVideoCount,
   deleteVideo,
 } = require("../controllers/videoController");
 
@@ -39,6 +40,7 @@ router.get(
   [param("userId").isInt().withMessage("userId must be an integer")],
   getUserVideos
 );
+router.get("/api/videos/count", getVideoCount)
 
 // Get videos from users you follow
 router.get("/api/videos/following", authMiddleware, getFollowingVideos);

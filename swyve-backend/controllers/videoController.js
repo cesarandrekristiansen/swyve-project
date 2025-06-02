@@ -116,7 +116,7 @@ exports.getAllVideos = async (req, res) => {
       LEFT JOIN video_likes vl ON vl.video_id = v.id
       LEFT JOIN comments c ON c.video_id = v.id 
       GROUP BY v.id, u.id
-      ORDER BY RANDOM()
+      ORDER BY v.id
       LIMIT $1
       OFFSET $2                                              
       `,
@@ -156,6 +156,18 @@ exports.getAllVideos = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+exports.getVideoCount = async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT COUNT(*) AS count FROM videos`)
+    const count = parseInt(result.rows[0].count, 10)
+    res.json({ count })
+  } catch (err) {
+    console.error("Error in getVideoCount:", err)
+    res.status(500).json({ error: err.message })
+  }
+}
 
 exports.getUserVideos = async (req, res) => {
   const errors = validationResult(req);
@@ -236,8 +248,8 @@ exports.getUserVideos = async (req, res) => {
 
 exports.getFollowingVideos = async (req, res) => {
   const userId = req.userId; // set by authMiddleware
-  const limit = parseInt(req.query.limit) || 10;
-  const offset = parseInt(req.query.offset) || 0;
+  const limit = parseInt(req.query.limit, 10) || 5;
+  const offset = parseInt(req.query.offset, 10) || 0;
   const cacheKey = `followingVideos:${userId}:${limit}:${offset}`;
 
   const cached = cache.get(cacheKey);
