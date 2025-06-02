@@ -62,7 +62,7 @@ exports.applyCreator = async (req, res) => {
 
     const mailOptions = {
       from: `"Swyve Applications" <${process.env.SMTP_USER}>`,
-      to: process.env.CREATOR_APP_INBOX,
+      to: process.env.MANDRILL_USER,
       subject: `New Creator Application: ${username} (ID ${userId})`,
       text: `
 User ID       : ${userId}
