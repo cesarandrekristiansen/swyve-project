@@ -155,14 +155,6 @@ function VideoCard({ video, onProfileClick }) {
         autoPlay={false}
         preload="auto"
       />
-
-      <div className="unmute">
-        {inView && (
-          <button className="video-unmute-button" onClick={handleUnmuteClick}>
-            <FaVolumeUp size={24} color="white" />
-          </button>
-        )}
-      </div>
       {paused && (
         <div className="video-paused-overlay" onClick={handlePlayClick}>
           <FaPlay size={48} color="white" />
@@ -201,6 +193,12 @@ function VideoCard({ video, onProfileClick }) {
         <button className="video-action-btn">
           <FaShare className="video-action-icon" />
         </button>
+
+        {inView && (
+          <button className="video-action-btn" onClick={handleUnmuteClick}>
+            <FaVolumeUp className="video-action-icon" />
+          </button>
+        )}
       </div>
 
       <div className="video-overlay">
