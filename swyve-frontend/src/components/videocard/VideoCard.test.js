@@ -35,3 +35,11 @@ describe.skip('VideoCard', () => {
     expect(screen.getByText('1')).toBeInTheDocument();
   });
 });
+
+describe('VideoCard component', () => {
+  it('is exported and is a function', () => {
+    expect(typeof VideoCard).toBe('function');
+
+    
+  });
+});
