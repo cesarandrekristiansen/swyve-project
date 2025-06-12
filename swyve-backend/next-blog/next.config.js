@@ -1,15 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-        remotePatterns: [
-          {
-            protocol: 'https',
-            hostname: 'blog.swyve.io', 
-            port: '',
-            pathname: '/**',
-          },
-        ],
+  basePath: '/blog',
+  assetPrefix: '/blog',
+  trailingSlash: true,
+  output: 'export',
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'blog.swyve.io',
+        port: '',
+        pathname: '/**',
       },
+    ],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -19,3 +23,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
