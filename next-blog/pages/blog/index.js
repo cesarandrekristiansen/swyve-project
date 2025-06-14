@@ -161,17 +161,22 @@ export default function BlogIndex({ posts }) {
       </ul>
 
       <div className="pagination">
-        {page > 1 && (
-          <button onClick={() => router.push(`/blog?p=${page - 1}`)}>
-            ◀ Previous
-          </button>
-        )}
-        {page < totalPages && (
-          <button onClick={() => router.push(`/blog?p=${page + 1}`)}>
-            Next ▶
-          </button>
-        )}
-      </div>
+  {page > 1 && (
+    <button onClick={() => router.push(`/blog?p=${page - 1}`)}>
+      ◀ Previous
+    </button>
+  )}
+
+  <span className="pagination-info">
+    Page {page} of {totalPages}
+  </span>
+
+  {page < totalPages && (
+    <button onClick={() => router.push(`/blog?p=${page + 1}`)}>
+      Next ▶
+    </button>
+  )}
+</div>
     </>
   );
 }

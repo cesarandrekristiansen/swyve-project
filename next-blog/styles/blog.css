@@ -286,6 +286,35 @@ html, body {
 .back-link a:hover {
   text-decoration: underline;
 }
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.pagination button {
+  background: #6a0dad;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.pagination button:hover {
+  background: #ff4500;
+}
+
+.pagination-info {
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
 
 @keyframes gradientAnimation {
   0% { background-position: 0% 50%; }
