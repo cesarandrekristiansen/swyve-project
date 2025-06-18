@@ -41,6 +41,11 @@ function LandingPage() {
       const data = await response.json();
       if (response.ok) {
         setMessage("Login successful!");
+
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+        
         setUser({ id: data.userId, email: data.email || "" });
 
         localStorage.removeItem("guest");

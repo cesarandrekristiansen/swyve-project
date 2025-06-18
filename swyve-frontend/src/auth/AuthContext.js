@@ -3,39 +3,53 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Stores { id, email }
-  const [loading, setLoading] = useState(true); // Useful for auth check loading
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const url = process.env.REACT_APP_BASE_URL || "http://localhost:5000";
 
-  // Called on mount - check if user is already logged in via cookie
   const checkAuth = async () => {
     try {
-      console.log("🔍 Checking auth...");
+      console.log("🔍 Checking auth via cookie...");
       const res = await fetch(`${url}/api/me`, {
         credentials: "include",
       });
+
       if (res.status === 401) {
-        // 401 just means no user cookie, so let's quietly handle it
-        console.log("Not logged in yet.");
-        setUser(null);
+        console.log("Not logged in via cookie. Trying fallback...");
+      } else if (!res.ok) {
+        throw new Error("Cookie request not OK");
+      } else {
+        const data = await res.json();
+        console.log("✅ Authenticated via cookie:", data.user);
+        setUser(data.user);
         return;
       }
-      if (!res.ok) {
-        console.log("🚫 /api/me response not ok:", res.status);
-        throw new Error("Not authenticated");
-      }
-      const data = await res.json();
-      console.log("✅ Authenticated user:", data.user);
-      setUser(data.user);
     } catch (err) {
-      console.error("❌ Auth check failed:", err.message);
-      setUser(null);
-    } finally {
-      setLoading(false);
+      console.warn("Cookie auth failed:", err.message);
     }
+
+    const fallbackToken = localStorage.getItem("token");
+    if (fallbackToken) {
+      try {
+        const res = await fetch(`${url}/api/me`, {
+          headers: {
+            Authorization: `Bearer ${fallbackToken}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          console.log("✅ Authenticated via fallback token:", data.user);
+          setUser(data.user);
+          return;
+        }
+      } catch (e) {
+        console.warn("Fallback token invalid or failed");
+      }
+    }
+
+    setUser(null);
   };
 
-  // Clears user + calls backend logout
   const logout = async () => {
     try {
       await fetch("/logout", {
@@ -45,12 +59,13 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error("Logout failed", err);
     } finally {
+      localStorage.removeItem("token"); 
       setUser(null);
     }
   };
 
   useEffect(() => {
-    checkAuth();
+    checkAuth().finally(() => setLoading(false));
   }, []);
 
   return (
@@ -60,5 +75,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Hook for convenience
 export const useAuth = () => useContext(AuthContext);
