@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
     setUser(null);
   };
-
+  
   const logout = async () => {
     try {
       await fetch("/logout", {

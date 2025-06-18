@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import fetchWithAuth from "../../../fallback/fetchWithAuth";
 
 export default function useProfileData(profileId, BASE_URL, currentUser) {
   const [profileData, setProfileData] = useState(null);
@@ -14,13 +15,11 @@ export default function useProfileData(profileId, BASE_URL, currentUser) {
     if (!profileId) return;
     setLoading(true);
 
-    const p1 = fetch(`${BASE_URL}/api/users/${profileId}`, {
-      credentials: "include",
-    }).then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)));
+    const p1 = fetchWithAuth(`${BASE_URL}/api/users/${profileId}`)
+    .then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)));
 
-    const p2 = fetch(`${BASE_URL}/api/users/${profileId}/videos`, {
-      credentials: "include",
-    }).then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)));
+    const p2 = fetchWithAuth(`${BASE_URL}/api/users/${profileId}/videos`)
+    .then((res) => (res.ok ? res.json() : Promise.reject(res.statusText)));
 
     Promise.all([p1, p2])
       .then(([profile, uploads]) => {
