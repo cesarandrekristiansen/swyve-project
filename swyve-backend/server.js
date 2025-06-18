@@ -13,10 +13,6 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(corsMiddleware);
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  next();
-});
 
 const passwordRoutes = require("./routes/passwordRoutes");
 app.use(passwordRoutes);

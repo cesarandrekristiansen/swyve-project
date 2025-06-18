@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
         maxAge: 60 * 60 * 1000,
       })
       .status(200)
-      .json({ username: user.username, userId: user.id, token });
+      .json({ username: user.username, userId: user.id });
   } catch (error) {
     console.error("Error in login route:", error);
     res.status(500).send({ error: "Error logging in" });

@@ -17,9 +17,7 @@ function Profile() {
   const { profileId } = useParams();
   const { user: currentUser } = useAuth();
   const isMyProfile = currentUser && parseInt(profileId, 10) === currentUser.id;
-  if (!profileId) {
-    return <Loading />; 
-  }
+
   const {
     profileData,
     userVideos,
